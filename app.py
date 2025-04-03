@@ -39,8 +39,20 @@ def index():
         form.blood_tests.append_entry()
     
     if request.method == 'POST':
-        if form.validate():
-            # Store form data in session
+        # Log form submission
+        logging.debug(f"Form submitted with data: {request.form}")
+        
+        # Check for validation errors and log them
+        if not form.validate_on_submit():
+            logging.debug(f"Form validation errors: {form.errors}")
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(f"Error in {field}: {error}", "danger")
+            # Return the form with validation errors
+            return render_template('form.html', form=form)
+            
+        # If form is valid, store form data in session
+        try:
             session['form_data'] = {
                 'personal_info': {
                     'first_name': form.first_name.data,
@@ -67,8 +79,16 @@ def index():
                 'dermatological_symptoms': request.form.getlist('dermatological_symptoms')
             }
             
+            # Add a success flash message
+            flash("Medical data successfully submitted!", "success")
+            
             # Redirect to results page
             return redirect(url_for('results'))
+        except Exception as e:
+            # Log any errors during form processing
+            logging.error(f"Error processing form: {str(e)}")
+            flash(f"An error occurred processing your submission: {str(e)}", "danger")
+            return render_template('form.html', form=form)
     
     return render_template('form.html', form=form)
 

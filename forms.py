@@ -20,8 +20,12 @@ class MultiCheckboxField(SelectMultipleField):
     """Custom field for multiple checkboxes"""
     
     def pre_validate(self, form):
-        # Skip pre-validation
+        # Skip pre-validation for checkboxes since they may be empty
         pass
+        
+    def process_formdata(self, valuelist):
+        # Allow empty checkbox selections
+        self.data = valuelist
 
 class MedicalDataForm(FlaskForm):
     """Form for collecting medical data"""

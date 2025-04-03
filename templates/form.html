@@ -7,7 +7,7 @@
     </div>
     <div class="card-body">
         <form method="POST" id="medicalDataForm">
-            {{ form.csrf_token }}
+            {{ form.hidden_tag() }}
             
             <!-- Personal Information Section -->
             <div class="card mb-4">
@@ -382,7 +382,28 @@
         $('#medicalDataForm').on('submit', function(e) {
             let isValid = true;
             
+            // Validate personal information
+            const firstName = $('#first_name').val();
+            const lastName = $('#last_name').val();
+            const gender = $('#gender').val();
+            const dob = $('#date_of_birth').val();
+            
+            if (!firstName || !lastName || !gender || !dob) {
+                isValid = false;
+                if (!firstName) $('#first_name').addClass('is-invalid');
+                if (!lastName) $('#last_name').addClass('is-invalid');
+                if (!gender) $('#gender').addClass('is-invalid');
+                if (!dob) $('#date_of_birth').addClass('is-invalid');
+                
+                $('html, body').animate({
+                    scrollTop: $('.card:first').offset().top - 20
+                }, 500);
+                
+                return false;
+            }
+            
             // Validate blood tests
+            let hasEmptyBloodTests = false;
             $('.blood-test-entry').each(function() {
                 const testName = $(this).find('.test-name').val();
                 const result = $(this).find('.test-result').val();
@@ -392,16 +413,53 @@
                 
                 if (!testName || !result || !unit || !refMin || !refMax) {
                     isValid = false;
+                    hasEmptyBloodTests = true;
                     $(this).addClass('border-danger');
+                    
+                    // Add specific validation classes to empty fields
+                    if (!result) $(this).find('.test-result').addClass('is-invalid');
+                    if (!refMin) $(this).find('.ref-min').addClass('is-invalid');
+                    if (!refMax) $(this).find('.ref-max').addClass('is-invalid');
+                    
                 } else {
                     $(this).removeClass('border-danger');
                 }
             });
             
-            if (!isValid) {
+            if (hasEmptyBloodTests) {
                 e.preventDefault();
+                
+                // Scroll to the blood tests section
+                $('html, body').animate({
+                    scrollTop: $('#blood-tests-container').offset().top - 20
+                }, 500);
+                
+                // Show error message
                 alert('Please fill in all required fields for blood tests.');
+                return false;
             }
+            
+            // Validate symptom duration
+            const symptomDuration = $('#symptom_duration').val();
+            if (!symptomDuration) {
+                isValid = false;
+                $('#symptom_duration').addClass('is-invalid');
+                
+                // Scroll to the symptom duration section
+                $('html, body').animate({
+                    scrollTop: $('#symptom_duration').offset().top - 20
+                }, 500);
+                
+                return false;
+            }
+            
+            // If the form is valid, show a loading message
+            if (isValid) {
+                // Disable the submit button to prevent double submission
+                $('button[type="submit"]').prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...');
+            }
+            
+            return isValid;
         });
     });
 </script>
