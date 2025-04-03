@@ -28,7 +28,8 @@ def index():
                     'test_name': test.test_name.data,
                     'result': test.result.data,
                     'ref_min': test.ref_min.data,
-                    'ref_max': test.ref_max.data
+                    'ref_max': test.ref_max.data,
+                    'unit': test.unit.data
                 } for test in form.blood_tests
             ],
             'symptom_duration': form.symptom_duration.data,

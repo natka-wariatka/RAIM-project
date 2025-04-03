@@ -89,25 +89,31 @@
                         <div class="blood-test-entry card mb-3">
                             <div class="card-body">
                                 <div class="row g-3">
-                                    <div class="col-md-6">
+                                    <div class="col-md-5">
                                         <div class="form-group">
                                             {{ blood_test.test_name.label(class="form-label") }}
-                                            {{ blood_test.test_name(class="form-control test-name") }}
+                                            {{ blood_test.test_name(class="form-control test-name", readonly=true) }}
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             {{ blood_test.result.label(class="form-label") }}
                                             {{ blood_test.result(class="form-control test-result") }}
                                         </div>
                                     </div>
-                                    <div class="col-md-5">
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            {{ blood_test.unit.label(class="form-label") }}
+                                            {{ blood_test.unit(class="form-control test-unit", readonly=true) }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             {{ blood_test.ref_min.label(class="form-label") }}
                                             {{ blood_test.ref_min(class="form-control ref-min") }}
                                         </div>
                                     </div>
-                                    <div class="col-md-5">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             {{ blood_test.ref_max.label(class="form-label") }}
                                             {{ blood_test.ref_max(class="form-control ref-max") }}
@@ -159,7 +165,7 @@
                             {% for choice in form.general_symptoms %}
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        {{ choice }}
+                                        {{ choice(class="form-check-input") }}
                                         {{ choice.label(class="form-check-label") }}
                                     </div>
                                 </div>
@@ -174,7 +180,7 @@
                             {% for choice in form.respiratory_symptoms %}
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        {{ choice }}
+                                        {{ choice(class="form-check-input") }}
                                         {{ choice.label(class="form-check-label") }}
                                     </div>
                                 </div>
@@ -189,7 +195,7 @@
                             {% for choice in form.circulatory_symptoms %}
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        {{ choice }}
+                                        {{ choice(class="form-check-input") }}
                                         {{ choice.label(class="form-check-label") }}
                                     </div>
                                 </div>
@@ -204,7 +210,7 @@
                             {% for choice in form.digestive_symptoms %}
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        {{ choice }}
+                                        {{ choice(class="form-check-input") }}
                                         {{ choice.label(class="form-check-label") }}
                                     </div>
                                 </div>
@@ -219,7 +225,7 @@
                             {% for choice in form.neurological_symptoms %}
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        {{ choice }}
+                                        {{ choice(class="form-check-input") }}
                                         {{ choice.label(class="form-check-label") }}
                                     </div>
                                 </div>
@@ -234,7 +240,7 @@
                             {% for choice in form.dermatological_symptoms %}
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        {{ choice }}
+                                        {{ choice(class="form-check-input") }}
                                         {{ choice.label(class="form-check-label") }}
                                     </div>
                                 </div>
@@ -260,25 +266,31 @@
             <div class="blood-test-entry card mb-3">
                 <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-5">
                             <div class="form-group">
                                 <label class="form-label">Test Name</label>
-                                <input class="form-control test-name" name="blood_tests-{index}-test_name" required>
+                                <input class="form-control test-name" name="blood_tests-{index}-test_name" readonly>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label class="form-label">Result</label>
                                 <input class="form-control test-result" name="blood_tests-{index}-result" type="number" step="any" required>
                             </div>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="form-label">Unit</label>
+                                <input class="form-control test-unit" name="blood_tests-{index}-unit" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label class="form-label">Reference Min</label>
                                 <input class="form-control ref-min" name="blood_tests-{index}-ref_min" type="number" step="any" required>
                             </div>
                         </div>
-                        <div class="col-md-5">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label class="form-label">Reference Max</label>
                                 <input class="form-control ref-max" name="blood_tests-{index}-ref_max" type="number" step="any" required>
@@ -294,13 +306,40 @@
             </div>
         `;
         
-        // Add new blood test
-        $('#addBloodTest').click(function() {
-            const index = $('.blood-test-entry').length;
-            const newTest = bloodTestTemplate.replace(/{index}/g, index);
-            $('#blood-tests-container').append(newTest);
-            updateBloodTestsIndexes();
-        });
+        // Predefined blood tests with their units
+        const predefinedBloodTests = [
+            { name: 'RBC', unit: 'million/µL', refMin: 4.2, refMax: 5.8 },
+            { name: 'HGB', unit: 'g/dL', refMin: 12.0, refMax: 15.5 },
+            { name: 'HCT', unit: '%', refMin: 36, refMax: 46 },
+            { name: 'MCV', unit: 'fL', refMin: 80, refMax: 100 },
+            { name: 'MCH', unit: 'pg', refMin: 27, refMax: 33 },
+            { name: 'MCHC', unit: 'g/dL', refMin: 32, refMax: 36 },
+            { name: 'WBC', unit: 'thousand/µL', refMin: 4.5, refMax: 11.0 },
+            { name: 'Neutrophils', unit: '%', refMin: 40, refMax: 75 },
+            { name: 'Lymphocytes', unit: '%', refMin: 20, refMax: 45 },
+            { name: 'Monocytes', unit: '%', refMin: 2, refMax: 10 },
+            { name: 'Eosinophils', unit: '%', refMin: 1, refMax: 6 },
+            { name: 'Basophils', unit: '%', refMin: 0, refMax: 2 },
+            { name: 'PLT', unit: 'thousand/µL', refMin: 150, refMax: 450 },
+            { name: 'MPV', unit: 'fL', refMin: 7.5, refMax: 11.5 }
+        ];
+        
+        // Initialize blood tests if container is empty
+        if ($('#blood-tests-container .blood-test-entry').length === 0) {
+            predefinedBloodTests.forEach((test, index) => {
+                const newTest = bloodTestTemplate.replace(/{index}/g, index);
+                $('#blood-tests-container').append(newTest);
+                
+                const entry = $($('#blood-tests-container .blood-test-entry')[index]);
+                entry.find('.test-name').val(test.name);
+                entry.find('.test-unit').val(test.unit);
+                entry.find('.ref-min').val(test.refMin);
+                entry.find('.ref-max').val(test.refMax);
+            });
+        }
+        
+        // Add new blood test button disabled since we're using predefined tests
+        $('#addBloodTest').prop('disabled', true).text('Using predefined blood tests').removeClass('btn-primary').addClass('btn-secondary');
         
         // Remove blood test
         $(document).on('click', '.remove-blood-test', function() {
@@ -318,6 +357,7 @@
                 const entry = $(this);
                 entry.find('.test-name').attr('name', `blood_tests-${index}-test_name`);
                 entry.find('.test-result').attr('name', `blood_tests-${index}-result`);
+                entry.find('.test-unit').attr('name', `blood_tests-${index}-unit`);
                 entry.find('.ref-min').attr('name', `blood_tests-${index}-ref_min`);
                 entry.find('.ref-max').attr('name', `blood_tests-${index}-ref_max`);
             });
@@ -366,10 +406,11 @@
             $('.blood-test-entry').each(function() {
                 const testName = $(this).find('.test-name').val();
                 const result = $(this).find('.test-result').val();
+                const unit = $(this).find('.test-unit').val();
                 const refMin = $(this).find('.ref-min').val();
                 const refMax = $(this).find('.ref-max').val();
                 
-                if (!testName || !result || !refMin || !refMax) {
+                if (!testName || !result || !unit || !refMin || !refMax) {
                     isValid = false;
                     $(this).addClass('border-danger');
                 } else {

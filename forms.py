@@ -10,6 +10,7 @@ class BloodTestForm(FlaskForm):
     result = FloatField('Result', validators=[DataRequired()])
     ref_min = FloatField('Reference Min', validators=[DataRequired()])
     ref_max = FloatField('Reference Max', validators=[DataRequired()])
+    unit = StringField('Unit', validators=[DataRequired()])
     
     class Meta:
         # Disable CSRF for nested form
