@@ -85,45 +85,40 @@
                 </div>
                 <div class="card-body">
                     <div id="blood-tests-container">
-                        {% for blood_test in form.blood_tests %}
-                        <div class="blood-test-entry card mb-3">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="test-title mb-2">
-                                            <strong>{{ blood_test.test_name(class="form-control-plaintext test-name p-0 fw-bold", readonly=true) }}</strong>
-                                            <span>({{ blood_test.unit(class="form-control-plaintext test-unit d-inline p-0", readonly=true, style="width: auto;") }})</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row align-items-center g-3">
-                                    <div class="col-md-3">
-                                        <div class="form-group mb-0">
-                                            <label class="form-label">Result</label>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead class="table-info">
+                                    <tr>
+                                        <th style="width: 35%">Test Name</th>
+                                        <th style="width: 20%">Result</th>
+                                        <th style="width: 15%">Ref Min</th>
+                                        <th style="width: 15%">Ref Max</th>
+                                        <th style="width: 15%">Unit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for blood_test in form.blood_tests %}
+                                    <tr class="blood-test-entry">
+                                        <td>
+                                            {{ blood_test.test_name(class="form-control-plaintext test-name fw-bold", readonly=true) }}
+                                        </td>
+                                        <td>
                                             {{ blood_test.result(class="form-control test-result", placeholder="Enter value") }}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group mb-0">
-                                            <label class="form-label">Ref min</label>
+                                        </td>
+                                        <td>
                                             {{ blood_test.ref_min(class="form-control ref-min", placeholder="Enter value") }}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group mb-0">
-                                            <label class="form-label">Ref max</label>
+                                        </td>
+                                        <td>
                                             {{ blood_test.ref_max(class="form-control ref-max", placeholder="Enter value") }}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 d-flex align-items-end">
-                                        <button type="button" class="btn btn-danger remove-blood-test">
-                                            <i class="fas fa-trash"></i> Remove
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                                        </td>
+                                        <td>
+                                            {{ blood_test.unit(class="form-control-plaintext test-unit", readonly=true) }}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
-                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -158,11 +153,13 @@
                     <div class="symptom-group mb-4">
                         <h4>1. General Symptoms</h4>
                         <div class="row">
-                            {% for choice in form.general_symptoms %}
+                            {% for value, label in form.general_symptoms.choices %}
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        {{ choice(class="form-check-input") }}
-                                        {{ choice.label(class="form-check-label") }}
+                                        <input class="form-check-input" type="checkbox" name="general_symptoms" value="{{ value }}" id="general_symptoms-{{ loop.index }}">
+                                        <label class="form-check-label" for="general_symptoms-{{ loop.index }}">
+                                            {{ label }}
+                                        </label>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -173,11 +170,13 @@
                     <div class="symptom-group mb-4">
                         <h4>2. Respiratory Symptoms</h4>
                         <div class="row">
-                            {% for choice in form.respiratory_symptoms %}
+                            {% for value, label in form.respiratory_symptoms.choices %}
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        {{ choice(class="form-check-input") }}
-                                        {{ choice.label(class="form-check-label") }}
+                                        <input class="form-check-input" type="checkbox" name="respiratory_symptoms" value="{{ value }}" id="respiratory_symptoms-{{ loop.index }}">
+                                        <label class="form-check-label" for="respiratory_symptoms-{{ loop.index }}">
+                                            {{ label }}
+                                        </label>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -188,11 +187,13 @@
                     <div class="symptom-group mb-4">
                         <h4>3. Circulatory System Symptoms</h4>
                         <div class="row">
-                            {% for choice in form.circulatory_symptoms %}
+                            {% for value, label in form.circulatory_symptoms.choices %}
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        {{ choice(class="form-check-input") }}
-                                        {{ choice.label(class="form-check-label") }}
+                                        <input class="form-check-input" type="checkbox" name="circulatory_symptoms" value="{{ value }}" id="circulatory_symptoms-{{ loop.index }}">
+                                        <label class="form-check-label" for="circulatory_symptoms-{{ loop.index }}">
+                                            {{ label }}
+                                        </label>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -203,11 +204,13 @@
                     <div class="symptom-group mb-4">
                         <h4>4. Digestive System Symptoms</h4>
                         <div class="row">
-                            {% for choice in form.digestive_symptoms %}
+                            {% for value, label in form.digestive_symptoms.choices %}
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        {{ choice(class="form-check-input") }}
-                                        {{ choice.label(class="form-check-label") }}
+                                        <input class="form-check-input" type="checkbox" name="digestive_symptoms" value="{{ value }}" id="digestive_symptoms-{{ loop.index }}">
+                                        <label class="form-check-label" for="digestive_symptoms-{{ loop.index }}">
+                                            {{ label }}
+                                        </label>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -218,11 +221,13 @@
                     <div class="symptom-group mb-4">
                         <h4>5. Neurological and Mental Symptoms</h4>
                         <div class="row">
-                            {% for choice in form.neurological_symptoms %}
+                            {% for value, label in form.neurological_symptoms.choices %}
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        {{ choice(class="form-check-input") }}
-                                        {{ choice.label(class="form-check-label") }}
+                                        <input class="form-check-input" type="checkbox" name="neurological_symptoms" value="{{ value }}" id="neurological_symptoms-{{ loop.index }}">
+                                        <label class="form-check-label" for="neurological_symptoms-{{ loop.index }}">
+                                            {{ label }}
+                                        </label>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -233,11 +238,13 @@
                     <div class="symptom-group mb-4">
                         <h4>6. Dermatological and Systemic Symptoms</h4>
                         <div class="row">
-                            {% for choice in form.dermatological_symptoms %}
+                            {% for value, label in form.dermatological_symptoms.choices %}
                                 <div class="col-md-6">
                                     <div class="form-check">
-                                        {{ choice(class="form-check-input") }}
-                                        {{ choice.label(class="form-check-label") }}
+                                        <input class="form-check-input" type="checkbox" name="dermatological_symptoms" value="{{ value }}" id="dermatological_symptoms-{{ loop.index }}">
+                                        <label class="form-check-label" for="dermatological_symptoms-{{ loop.index }}">
+                                            {{ label }}
+                                        </label>
                                     </div>
                                 </div>
                             {% endfor %}
@@ -259,43 +266,23 @@
     $(document).ready(function() {
         // Blood test template for adding new tests
         const bloodTestTemplate = `
-            <div class="blood-test-entry card mb-3">
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="test-title mb-2">
-                                <strong><input class="form-control-plaintext test-name p-0 fw-bold" name="blood_tests-{index}-test_name" readonly></strong>
-                                <span>(<input class="form-control-plaintext test-unit d-inline p-0" name="blood_tests-{index}-unit" readonly style="width: auto;">)</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row align-items-center g-3">
-                        <div class="col-md-3">
-                            <div class="form-group mb-0">
-                                <label class="form-label">Result</label>
-                                <input class="form-control test-result" name="blood_tests-{index}-result" type="number" step="any" required placeholder="Enter value">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group mb-0">
-                                <label class="form-label">Ref min</label>
-                                <input class="form-control ref-min" name="blood_tests-{index}-ref_min" type="number" step="any" required placeholder="Enter value">
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="form-group mb-0">
-                                <label class="form-label">Ref max</label>
-                                <input class="form-control ref-max" name="blood_tests-{index}-ref_max" type="number" step="any" required placeholder="Enter value">
-                            </div>
-                        </div>
-                        <div class="col-md-3 d-flex align-items-end">
-                            <button type="button" class="btn btn-danger remove-blood-test">
-                                <i class="fas fa-trash"></i> Remove
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <tr class="blood-test-entry">
+                <td>
+                    <input class="form-control-plaintext test-name fw-bold" name="blood_tests-{index}-test_name" readonly>
+                </td>
+                <td>
+                    <input class="form-control test-result" name="blood_tests-{index}-result" type="number" step="any" required placeholder="Enter value">
+                </td>
+                <td>
+                    <input class="form-control ref-min" name="blood_tests-{index}-ref_min" type="number" step="any" required placeholder="Enter value">
+                </td>
+                <td>
+                    <input class="form-control ref-max" name="blood_tests-{index}-ref_max" type="number" step="any" required placeholder="Enter value">
+                </td>
+                <td>
+                    <input class="form-control-plaintext test-unit" name="blood_tests-{index}-unit" readonly>
+                </td>
+            </tr>
         `;
         
         // Predefined blood tests with their units

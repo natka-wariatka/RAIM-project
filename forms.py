@@ -18,7 +18,6 @@ class BloodTestForm(FlaskForm):
 
 class MultiCheckboxField(SelectMultipleField):
     """Custom field for multiple checkboxes"""
-    widget = CheckboxInput()
     
     def pre_validate(self, form):
         # Skip pre-validation

@@ -14,35 +14,37 @@ app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")  # Default f
 def index():
     form = MedicalDataForm()
     
-    if form.validate_on_submit():
-        # Store form data in session
-        session['form_data'] = {
-            'personal_info': {
-                'first_name': form.first_name.data,
-                'last_name': form.last_name.data,
-                'gender': form.gender.data,
-                'date_of_birth': form.date_of_birth.data.strftime('%d.%m.%Y') if form.date_of_birth.data else None
-            },
-            'blood_tests': [
-                {
-                    'test_name': test.test_name.data,
-                    'result': test.result.data,
-                    'ref_min': test.ref_min.data,
-                    'ref_max': test.ref_max.data,
-                    'unit': test.unit.data
-                } for test in form.blood_tests
-            ],
-            'symptom_duration': form.symptom_duration.data,
-            'general_symptoms': [symptom for symptom in form.general_symptoms.data] if form.general_symptoms.data else [],
-            'respiratory_symptoms': [symptom for symptom in form.respiratory_symptoms.data] if form.respiratory_symptoms.data else [],
-            'circulatory_symptoms': [symptom for symptom in form.circulatory_symptoms.data] if form.circulatory_symptoms.data else [],
-            'digestive_symptoms': [symptom for symptom in form.digestive_symptoms.data] if form.digestive_symptoms.data else [],
-            'neurological_symptoms': [symptom for symptom in form.neurological_symptoms.data] if form.neurological_symptoms.data else [],
-            'dermatological_symptoms': [symptom for symptom in form.dermatological_symptoms.data] if form.dermatological_symptoms.data else []
-        }
-        
-        # Redirect to results page
-        return redirect(url_for('results'))
+    if request.method == 'POST':
+        if form.validate():
+            # Store form data in session
+            session['form_data'] = {
+                'personal_info': {
+                    'first_name': form.first_name.data,
+                    'last_name': form.last_name.data,
+                    'gender': form.gender.data,
+                    'date_of_birth': form.date_of_birth.data.strftime('%d.%m.%Y') if form.date_of_birth.data else None
+                },
+                'blood_tests': [
+                    {
+                        'test_name': test.test_name.data,
+                        'result': test.result.data,
+                        'ref_min': test.ref_min.data,
+                        'ref_max': test.ref_max.data,
+                        'unit': test.unit.data
+                    } for test in form.blood_tests
+                ],
+                'symptom_duration': form.symptom_duration.data,
+                # Get symptoms from request form data since we're using custom checkboxes
+                'general_symptoms': request.form.getlist('general_symptoms'),
+                'respiratory_symptoms': request.form.getlist('respiratory_symptoms'),
+                'circulatory_symptoms': request.form.getlist('circulatory_symptoms'),
+                'digestive_symptoms': request.form.getlist('digestive_symptoms'),
+                'neurological_symptoms': request.form.getlist('neurological_symptoms'),
+                'dermatological_symptoms': request.form.getlist('dermatological_symptoms')
+            }
+            
+            # Redirect to results page
+            return redirect(url_for('results'))
     
     return render_template('form.html', form=form)
 

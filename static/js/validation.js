@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (dobInput) {
         dobInput.addEventListener('input', function() {
             const value = this.value;
-            const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+            const dateRegex = /^(\d{2})\.(\d{2})\.(\d{4})$/;
             
             if (value && !dateRegex.test(value)) {
                 this.classList.add('is-invalid');
@@ -42,9 +42,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     feedbackEl.classList.add('invalid-feedback');
                     this.parentNode.insertBefore(feedbackEl, this.nextSibling);
                 }
-                feedbackEl.textContent = 'Please enter a valid date in DD/MM/YYYY format';
+                feedbackEl.textContent = 'Please enter a valid date in DD.MM.YYYY format';
             } else if (value) {
-                const parts = value.split('/');
+                const parts = value.split('.');
                 const day = parseInt(parts[0], 10);
                 const month = parseInt(parts[1], 10) - 1;
                 const year = parseInt(parts[2], 10);
