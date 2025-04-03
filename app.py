@@ -21,7 +21,7 @@ def index():
                 'first_name': form.first_name.data,
                 'last_name': form.last_name.data,
                 'gender': form.gender.data,
-                'date_of_birth': form.date_of_birth.data.strftime('%d/%m/%Y') if form.date_of_birth.data else None
+                'date_of_birth': form.date_of_birth.data.strftime('%d.%m.%Y') if form.date_of_birth.data else None
             },
             'blood_tests': [
                 {
@@ -33,12 +33,12 @@ def index():
                 } for test in form.blood_tests
             ],
             'symptom_duration': form.symptom_duration.data,
-            'general_symptoms': [symptom for symptom in form.general_symptoms.data],
-            'respiratory_symptoms': [symptom for symptom in form.respiratory_symptoms.data],
-            'circulatory_symptoms': [symptom for symptom in form.circulatory_symptoms.data],
-            'digestive_symptoms': [symptom for symptom in form.digestive_symptoms.data],
-            'neurological_symptoms': [symptom for symptom in form.neurological_symptoms.data],
-            'dermatological_symptoms': [symptom for symptom in form.dermatological_symptoms.data]
+            'general_symptoms': [symptom for symptom in form.general_symptoms.data] if form.general_symptoms.data else [],
+            'respiratory_symptoms': [symptom for symptom in form.respiratory_symptoms.data] if form.respiratory_symptoms.data else [],
+            'circulatory_symptoms': [symptom for symptom in form.circulatory_symptoms.data] if form.circulatory_symptoms.data else [],
+            'digestive_symptoms': [symptom for symptom in form.digestive_symptoms.data] if form.digestive_symptoms.data else [],
+            'neurological_symptoms': [symptom for symptom in form.neurological_symptoms.data] if form.neurological_symptoms.data else [],
+            'dermatological_symptoms': [symptom for symptom in form.dermatological_symptoms.data] if form.dermatological_symptoms.data else []
         }
         
         # Redirect to results page

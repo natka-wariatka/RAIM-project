@@ -39,8 +39,8 @@ class MedicalDataForm(FlaskForm):
                          choices=[('', 'Select Gender'), ('female', 'Female'), ('male', 'Male')],
                          validators=[DataRequired()])
     
-    date_of_birth = DateField('Date of Birth (DD/MM/YYYY)', 
-                              format='%d/%m/%Y',
+    date_of_birth = DateField('Date of Birth (DD.MM.YYYY)', 
+                              format='%d.%m.%Y',
                               validators=[DataRequired()])
     
     # Blood Test Results

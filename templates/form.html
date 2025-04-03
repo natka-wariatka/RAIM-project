@@ -60,7 +60,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 {{ form.date_of_birth.label(class="form-label") }}
-                                {{ form.date_of_birth(class="form-control" + (" is-invalid" if form.date_of_birth.errors else ""), placeholder="DD/MM/YYYY") }}
+                                {{ form.date_of_birth(class="form-control" + (" is-invalid" if form.date_of_birth.errors else ""), placeholder="DD.MM.YYYY") }}
                                 {% if form.date_of_birth.errors %}
                                     <div class="invalid-feedback">
                                         {% for error in form.date_of_birth.errors %}
@@ -68,7 +68,7 @@
                                         {% endfor %}
                                     </div>
                                 {% endif %}
-                                <div class="form-text">Format: DD/MM/YYYY</div>
+                                <div class="form-text">Format: DD.MM.YYYY</div>
                             </div>
                         </div>
                     </div>
@@ -366,12 +366,12 @@
         // Date input validation
         $('#date_of_birth').on('blur', function() {
             const value = $(this).val();
-            const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+            const dateRegex = /^(\d{2})\.(\d{2})\.(\d{4})$/;
             
             if (!dateRegex.test(value)) {
                 $(this).addClass('is-invalid');
                 if (!$(this).next('.invalid-feedback').length) {
-                    $(this).after('<div class="invalid-feedback">Please enter a valid date in DD/MM/YYYY format.</div>');
+                    $(this).after('<div class="invalid-feedback">Please enter a valid date in DD.MM.YYYY format.</div>');
                 }
             } else {
                 const matches = value.match(dateRegex);
