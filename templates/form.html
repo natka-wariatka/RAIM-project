@@ -1,0 +1,387 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0">Patient Data Form</h2>
+    </div>
+    <div class="card-body">
+        <form method="POST" id="medicalDataForm">
+            {{ form.csrf_token }}
+            
+            <!-- Personal Information Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">Personal Information</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.first_name.label(class="form-label") }}
+                                {{ form.first_name(class="form-control" + (" is-invalid" if form.first_name.errors else "")) }}
+                                {% if form.first_name.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.first_name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Must contain only letters</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.last_name.label(class="form-label") }}
+                                {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else "")) }}
+                                {% if form.last_name.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.last_name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Must contain only letters</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.gender.label(class="form-label") }}
+                                {{ form.gender(class="form-select" + (" is-invalid" if form.gender.errors else "")) }}
+                                {% if form.gender.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.gender.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form.date_of_birth.label(class="form-label") }}
+                                {{ form.date_of_birth(class="form-control" + (" is-invalid" if form.date_of_birth.errors else ""), placeholder="DD/MM/YYYY") }}
+                                {% if form.date_of_birth.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.date_of_birth.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Format: DD/MM/YYYY</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Blood Test Results Section -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Blood Test Results</h3>
+                    <button type="button" class="btn btn-light" id="addBloodTest">
+                        <i class="fas fa-plus"></i> Add Test
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="blood-tests-container">
+                        {% for blood_test in form.blood_tests %}
+                        <div class="blood-test-entry card mb-3">
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ blood_test.test_name.label(class="form-label") }}
+                                            {{ blood_test.test_name(class="form-control test-name") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            {{ blood_test.result.label(class="form-label") }}
+                                            {{ blood_test.result(class="form-control test-result") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            {{ blood_test.ref_min.label(class="form-label") }}
+                                            {{ blood_test.ref_min(class="form-control ref-min") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group">
+                                            {{ blood_test.ref_max.label(class="form-label") }}
+                                            {{ blood_test.ref_max(class="form-control ref-max") }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button type="button" class="btn btn-danger remove-blood-test w-100">
+                                            <i class="fas fa-trash"></i> Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Symptom Duration -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">Symptom Duration</h3>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        {{ form.symptom_duration.label(class="form-label") }}
+                        {{ form.symptom_duration(class="form-select" + (" is-invalid" if form.symptom_duration.errors else "")) }}
+                        {% if form.symptom_duration.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.symptom_duration.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Symptoms Sections -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">Symptoms</h3>
+                </div>
+                <div class="card-body">
+                    <!-- General Symptoms -->
+                    <div class="symptom-group mb-4">
+                        <h4>1. General Symptoms</h4>
+                        <div class="row">
+                            {% for choice in form.general_symptoms %}
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        {{ choice }}
+                                        {{ choice.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Respiratory Symptoms -->
+                    <div class="symptom-group mb-4">
+                        <h4>2. Respiratory Symptoms</h4>
+                        <div class="row">
+                            {% for choice in form.respiratory_symptoms %}
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        {{ choice }}
+                                        {{ choice.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Circulatory Symptoms -->
+                    <div class="symptom-group mb-4">
+                        <h4>3. Circulatory System Symptoms</h4>
+                        <div class="row">
+                            {% for choice in form.circulatory_symptoms %}
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        {{ choice }}
+                                        {{ choice.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Digestive Symptoms -->
+                    <div class="symptom-group mb-4">
+                        <h4>4. Digestive System Symptoms</h4>
+                        <div class="row">
+                            {% for choice in form.digestive_symptoms %}
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        {{ choice }}
+                                        {{ choice.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Neurological Symptoms -->
+                    <div class="symptom-group mb-4">
+                        <h4>5. Neurological and Mental Symptoms</h4>
+                        <div class="row">
+                            {% for choice in form.neurological_symptoms %}
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        {{ choice }}
+                                        {{ choice.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Dermatological Symptoms -->
+                    <div class="symptom-group mb-4">
+                        <h4>6. Dermatological and Systemic Symptoms</h4>
+                        <div class="row">
+                            {% for choice in form.dermatological_symptoms %}
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        {{ choice }}
+                                        {{ choice.label(class="form-check-label") }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">Submit Medical Data</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Blood test template for adding new tests
+        const bloodTestTemplate = `
+            <div class="blood-test-entry card mb-3">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Test Name</label>
+                                <input class="form-control test-name" name="blood_tests-{index}-test_name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Result</label>
+                                <input class="form-control test-result" name="blood_tests-{index}-result" type="number" step="any" required>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label class="form-label">Reference Min</label>
+                                <input class="form-control ref-min" name="blood_tests-{index}-ref_min" type="number" step="any" required>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label class="form-label">Reference Max</label>
+                                <input class="form-control ref-max" name="blood_tests-{index}-ref_max" type="number" step="any" required>
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-danger remove-blood-test w-100">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add new blood test
+        $('#addBloodTest').click(function() {
+            const index = $('.blood-test-entry').length;
+            const newTest = bloodTestTemplate.replace(/{index}/g, index);
+            $('#blood-tests-container').append(newTest);
+            updateBloodTestsIndexes();
+        });
+        
+        // Remove blood test
+        $(document).on('click', '.remove-blood-test', function() {
+            if ($('.blood-test-entry').length > 1) {
+                $(this).closest('.blood-test-entry').remove();
+                updateBloodTestsIndexes();
+            } else {
+                alert('At least one blood test is required.');
+            }
+        });
+        
+        // Update indexes for blood tests
+        function updateBloodTestsIndexes() {
+            $('.blood-test-entry').each(function(index) {
+                const entry = $(this);
+                entry.find('.test-name').attr('name', `blood_tests-${index}-test_name`);
+                entry.find('.test-result').attr('name', `blood_tests-${index}-result`);
+                entry.find('.ref-min').attr('name', `blood_tests-${index}-ref_min`);
+                entry.find('.ref-max').attr('name', `blood_tests-${index}-ref_max`);
+            });
+        }
+        
+        // Date input validation
+        $('#date_of_birth').on('blur', function() {
+            const value = $(this).val();
+            const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+            
+            if (!dateRegex.test(value)) {
+                $(this).addClass('is-invalid');
+                if (!$(this).next('.invalid-feedback').length) {
+                    $(this).after('<div class="invalid-feedback">Please enter a valid date in DD/MM/YYYY format.</div>');
+                }
+            } else {
+                const matches = value.match(dateRegex);
+                const day = parseInt(matches[1], 10);
+                const month = parseInt(matches[2], 10);
+                const year = parseInt(matches[3], 10);
+                
+                // Check if date is valid
+                const date = new Date(year, month - 1, day);
+                if (
+                    date.getDate() !== day ||
+                    date.getMonth() + 1 !== month ||
+                    date.getFullYear() !== year ||
+                    date > new Date()
+                ) {
+                    $(this).addClass('is-invalid');
+                    if (!$(this).next('.invalid-feedback').length) {
+                        $(this).after('<div class="invalid-feedback">Please enter a valid date that is not in the future.</div>');
+                    }
+                } else {
+                    $(this).removeClass('is-invalid');
+                    $(this).next('.invalid-feedback').remove();
+                }
+            }
+        });
+        
+        // Form validation
+        $('#medicalDataForm').on('submit', function(e) {
+            let isValid = true;
+            
+            // Validate blood tests
+            $('.blood-test-entry').each(function() {
+                const testName = $(this).find('.test-name').val();
+                const result = $(this).find('.test-result').val();
+                const refMin = $(this).find('.ref-min').val();
+                const refMax = $(this).find('.ref-max').val();
+                
+                if (!testName || !result || !refMin || !refMax) {
+                    isValid = false;
+                    $(this).addClass('border-danger');
+                } else {
+                    $(this).removeClass('border-danger');
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Please fill in all required fields for blood tests.');
+            }
+        });
+    });
+</script>
+{% endblock %}
