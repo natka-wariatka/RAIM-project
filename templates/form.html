@@ -88,39 +88,35 @@
                         {% for blood_test in form.blood_tests %}
                         <div class="blood-test-entry card mb-3">
                             <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-md-5">
-                                        <div class="form-group">
-                                            {{ blood_test.test_name.label(class="form-label") }}
-                                            {{ blood_test.test_name(class="form-control test-name", readonly=true) }}
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="test-title mb-2">
+                                            <strong>{{ blood_test.test_name(class="form-control-plaintext test-name p-0 fw-bold", readonly=true) }}</strong>
+                                            <span>({{ blood_test.unit(class="form-control-plaintext test-unit d-inline p-0", readonly=true, style="width: auto;") }})</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row align-items-center g-3">
+                                    <div class="col-md-3">
+                                        <div class="form-group mb-0">
+                                            <label class="form-label">Result</label>
+                                            {{ blood_test.result(class="form-control test-result", placeholder="Enter value") }}
                                         </div>
                                     </div>
                                     <div class="col-md-3">
-                                        <div class="form-group">
-                                            {{ blood_test.result.label(class="form-label") }}
-                                            {{ blood_test.result(class="form-control test-result") }}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            {{ blood_test.unit.label(class="form-label") }}
-                                            {{ blood_test.unit(class="form-control test-unit", readonly=true) }}
+                                        <div class="form-group mb-0">
+                                            <label class="form-label">Ref min</label>
+                                            {{ blood_test.ref_min(class="form-control ref-min", placeholder="Enter value") }}
                                         </div>
                                     </div>
                                     <div class="col-md-3">
-                                        <div class="form-group">
-                                            {{ blood_test.ref_min.label(class="form-label") }}
-                                            {{ blood_test.ref_min(class="form-control ref-min") }}
+                                        <div class="form-group mb-0">
+                                            <label class="form-label">Ref max</label>
+                                            {{ blood_test.ref_max(class="form-control ref-max", placeholder="Enter value") }}
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            {{ blood_test.ref_max.label(class="form-label") }}
-                                            {{ blood_test.ref_max(class="form-control ref-max") }}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-end">
-                                        <button type="button" class="btn btn-danger remove-blood-test w-100">
+                                    <div class="col-md-3 d-flex align-items-end">
+                                        <button type="button" class="btn btn-danger remove-blood-test">
                                             <i class="fas fa-trash"></i> Remove
                                         </button>
                                     </div>
@@ -265,39 +261,35 @@
         const bloodTestTemplate = `
             <div class="blood-test-entry card mb-3">
                 <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-5">
-                            <div class="form-group">
-                                <label class="form-label">Test Name</label>
-                                <input class="form-control test-name" name="blood_tests-{index}-test_name" readonly>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="test-title mb-2">
+                                <strong><input class="form-control-plaintext test-name p-0 fw-bold" name="blood_tests-{index}-test_name" readonly></strong>
+                                <span>(<input class="form-control-plaintext test-unit d-inline p-0" name="blood_tests-{index}-unit" readonly style="width: auto;">)</span>
                             </div>
                         </div>
+                    </div>
+                    <div class="row align-items-center g-3">
                         <div class="col-md-3">
-                            <div class="form-group">
+                            <div class="form-group mb-0">
                                 <label class="form-label">Result</label>
-                                <input class="form-control test-result" name="blood_tests-{index}-result" type="number" step="any" required>
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <div class="form-group">
-                                <label class="form-label">Unit</label>
-                                <input class="form-control test-unit" name="blood_tests-{index}-unit" readonly>
+                                <input class="form-control test-result" name="blood_tests-{index}-result" type="number" step="any" required placeholder="Enter value">
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-group">
-                                <label class="form-label">Reference Min</label>
-                                <input class="form-control ref-min" name="blood_tests-{index}-ref_min" type="number" step="any" required>
+                            <div class="form-group mb-0">
+                                <label class="form-label">Ref min</label>
+                                <input class="form-control ref-min" name="blood_tests-{index}-ref_min" type="number" step="any" required placeholder="Enter value">
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <div class="form-group">
-                                <label class="form-label">Reference Max</label>
-                                <input class="form-control ref-max" name="blood_tests-{index}-ref_max" type="number" step="any" required>
+                            <div class="form-group mb-0">
+                                <label class="form-label">Ref max</label>
+                                <input class="form-control ref-max" name="blood_tests-{index}-ref_max" type="number" step="any" required placeholder="Enter value">
                             </div>
                         </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="button" class="btn btn-danger remove-blood-test w-100">
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-danger remove-blood-test">
                                 <i class="fas fa-trash"></i> Remove
                             </button>
                         </div>
@@ -308,20 +300,20 @@
         
         // Predefined blood tests with their units
         const predefinedBloodTests = [
-            { name: 'RBC', unit: 'million/µL', refMin: 4.2, refMax: 5.8 },
-            { name: 'HGB', unit: 'g/dL', refMin: 12.0, refMax: 15.5 },
-            { name: 'HCT', unit: '%', refMin: 36, refMax: 46 },
-            { name: 'MCV', unit: 'fL', refMin: 80, refMax: 100 },
-            { name: 'MCH', unit: 'pg', refMin: 27, refMax: 33 },
-            { name: 'MCHC', unit: 'g/dL', refMin: 32, refMax: 36 },
-            { name: 'WBC', unit: 'thousand/µL', refMin: 4.5, refMax: 11.0 },
+            { name: 'RBC Erythrocytes', unit: 'million/µL', refMin: 4.2, refMax: 5.8 },
+            { name: 'HGB Hemoglobin', unit: 'g/dL', refMin: 12.0, refMax: 15.5 },
+            { name: 'HCT Hematocrit', unit: '%', refMin: 36, refMax: 46 },
+            { name: 'MCV Mean erythrocyte volume', unit: 'fL', refMin: 80, refMax: 100 },
+            { name: 'MCH Mean hemoglobin mass in erythrocyte', unit: 'pg', refMin: 27, refMax: 33 },
+            { name: 'MCHC Mean hemoglobin concentration in an erythrocyte', unit: 'g/dL', refMin: 32, refMax: 36 },
+            { name: 'WBC Leukocytes', unit: 'thousands/µL', refMin: 4.5, refMax: 11.0 },
             { name: 'Neutrophils', unit: '%', refMin: 40, refMax: 75 },
             { name: 'Lymphocytes', unit: '%', refMin: 20, refMax: 45 },
             { name: 'Monocytes', unit: '%', refMin: 2, refMax: 10 },
             { name: 'Eosinophils', unit: '%', refMin: 1, refMax: 6 },
             { name: 'Basophils', unit: '%', refMin: 0, refMax: 2 },
-            { name: 'PLT', unit: 'thousand/µL', refMin: 150, refMax: 450 },
-            { name: 'MPV', unit: 'fL', refMin: 7.5, refMax: 11.5 }
+            { name: 'PLT Thrombocytes', unit: 'thousands/µL', refMin: 150, refMax: 450 },
+            { name: 'MPV Mean platelet volume', unit: 'fL', refMin: 7.5, refMax: 11.5 }
         ];
         
         // Initialize blood tests if container is empty

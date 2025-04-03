@@ -26,6 +26,32 @@
     border: 2px solid var(--bs-danger) !important;
 }
 
+.test-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    line-height: 1.4;
+}
+
+.test-name {
+    font-weight: bold;
+    margin-right: 5px;
+    display: inline;
+}
+
+.test-unit {
+    color: var(--bs-secondary);
+    display: inline;
+    width: auto !important;
+}
+
+input.form-control-plaintext {
+    background: transparent;
+    border: none;
+    padding: 0;
+    outline: none;
+}
+
 /* Checkbox styling */
 .form-check {
     padding: 0.5rem;
