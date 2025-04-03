@@ -8,9 +8,15 @@ class BloodTestForm(FlaskForm):
     """Form for a single blood test result"""
     test_name = StringField('Test Name', validators=[DataRequired()])
     result = FloatField('Result', validators=[DataRequired()])
-    ref_min = FloatField('Reference Min', validators=[DataRequired()])
+    ref_min = FloatField('Reference Min', validators=[Optional()]) # Allow None/empty, will be set to 0
     ref_max = FloatField('Reference Max', validators=[DataRequired()])
     unit = StringField('Unit', validators=[DataRequired()])
+    
+    def validate_ref_min(self, field):
+        """Custom validator to allow 0 as a valid value"""
+        # If the field is None or empty, assume 0
+        if field.data is None or field.data == '':
+            field.data = 0.0
     
     class Meta:
         # Disable CSRF for nested form

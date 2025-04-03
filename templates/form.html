@@ -411,14 +411,17 @@
                 const refMin = $(this).find('.ref-min').val();
                 const refMax = $(this).find('.ref-max').val();
                 
-                if (!testName || !result || !unit || !refMin || !refMax) {
+                // Special handling for ref_min - allow 0 or empty
+                const isRefMinValid = refMin === '0' || refMin === '0.0' || refMin === 0 || refMin;
+                
+                if (!testName || !result || !unit || !isRefMinValid || !refMax) {
                     isValid = false;
                     hasEmptyBloodTests = true;
                     $(this).addClass('border-danger');
                     
                     // Add specific validation classes to empty fields
                     if (!result) $(this).find('.test-result').addClass('is-invalid');
-                    if (!refMin) $(this).find('.ref-min').addClass('is-invalid');
+                    if (!isRefMinValid) $(this).find('.ref-min').addClass('is-invalid');
                     if (!refMax) $(this).find('.ref-max').addClass('is-invalid');
                     
                 } else {

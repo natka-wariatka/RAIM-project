@@ -64,7 +64,7 @@ def index():
                     {
                         'test_name': test.test_name.data,
                         'result': test.result.data,
-                        'ref_min': test.ref_min.data,
+                        'ref_min': 0.0 if test.ref_min.data is None or test.ref_min.data == '' else test.ref_min.data,
                         'ref_max': test.ref_max.data,
                         'unit': test.unit.data
                     } for test in form.blood_tests

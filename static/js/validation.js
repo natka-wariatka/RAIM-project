@@ -85,6 +85,17 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const value = e.target.value;
             
+            // Special handling for ref-min which can be 0 or empty
+            if (e.target.classList.contains('ref-min') && (value === '0' || value === '0.0' || value === '' || value === null)) {
+                e.target.classList.remove('is-invalid');
+                const feedbackEl = e.target.nextElementSibling;
+                if (feedbackEl && feedbackEl.classList.contains('invalid-feedback')) {
+                    feedbackEl.remove();
+                }
+                return;
+            }
+            
+            // For other numerical fields
             if (value && isNaN(parseFloat(value))) {
                 e.target.classList.add('is-invalid');
                 let feedbackEl = e.target.nextElementSibling;
