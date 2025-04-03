@@ -1,0 +1,3 @@
+flask
+langchain-core
+langchain-ollama
