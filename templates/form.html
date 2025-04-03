@@ -308,8 +308,31 @@
             { name: 'MPV Mean platelet volume', unit: 'fL', refMin: 7.5, refMax: 11.5 }
         ];
         
-        // Initialize blood tests if container is empty
-        if ($('#blood-tests-container .blood-test-entry').length === 0) {
+        // Always ensure we have all predefined blood tests
+        // First, clear any existing entries
+        $('#blood-tests-tbody').empty();
+        
+        // Add all predefined blood tests
+        predefinedBloodTests.forEach((test, index) => {
+            const newTest = bloodTestTemplate.replace(/{index}/g, index);
+            $('#blood-tests-tbody').append(newTest);
+            
+            const entry = $($('#blood-tests-tbody .blood-test-entry')[index]);
+            entry.find('.test-name').val(test.name);
+            entry.find('.test-unit').val(test.unit);
+            entry.find('.ref-min').val(test.refMin);
+            entry.find('.ref-max').val(test.refMax);
+        });
+        
+        // Add new blood test button disabled since we're using predefined tests
+        $('#addBloodTest').prop('disabled', true).text('Using predefined tests').removeClass('btn-primary').addClass('btn-secondary');
+        
+        // Initialize blood tests button functionality
+        $('#initializeBloodTests').on('click', function() {
+            // Clear the blood tests tbody and repopulate with all predefined tests
+            $('#blood-tests-tbody').empty();
+            
+            // Add all predefined blood tests
             predefinedBloodTests.forEach((test, index) => {
                 const newTest = bloodTestTemplate.replace(/{index}/g, index);
                 $('#blood-tests-tbody').append(newTest);
@@ -320,51 +343,9 @@
                 entry.find('.ref-min').val(test.refMin);
                 entry.find('.ref-max').val(test.refMax);
             });
-        } else {
-            // If blood test entries already exist, make sure they have proper test names and units
-            $('#blood-tests-tbody .blood-test-entry').each(function(index) {
-                if (index < predefinedBloodTests.length) {
-                    const test = predefinedBloodTests[index];
-                    const entry = $(this);
-                    
-                    // Only set the values if they're empty
-                    if (!entry.find('.test-name').val()) {
-                        entry.find('.test-name').val(test.name);
-                    }
-                    if (!entry.find('.test-unit').val()) {
-                        entry.find('.test-unit').val(test.unit);
-                    }
-                    if (!entry.find('.ref-min').val()) {
-                        entry.find('.ref-min').val(test.refMin);
-                    }
-                    if (!entry.find('.ref-max').val()) {
-                        entry.find('.ref-max').val(test.refMax);
-                    }
-                }
-            });
-        }
-        
-        // Add new blood test button disabled since we're using predefined tests
-        $('#addBloodTest').prop('disabled', true).text('Using predefined tests').removeClass('btn-primary').addClass('btn-secondary');
-        
-        // Initialize blood tests button functionality
-        $('#initializeBloodTests').on('click', function() {
-            // Loop through each existing blood test entry and set values from predefined tests
-            $('#blood-tests-tbody .blood-test-entry').each(function(index) {
-                if (index < predefinedBloodTests.length) {
-                    const test = predefinedBloodTests[index];
-                    const entry = $(this);
-                    
-                    // Set the values regardless of whether they're empty or not
-                    entry.find('.test-name').val(test.name);
-                    entry.find('.test-unit').val(test.unit);
-                    entry.find('.ref-min').val(test.refMin);
-                    entry.find('.ref-max').val(test.refMax);
-                }
-            });
             
             // Display success message
-            alert('Blood test names, units, and reference values have been initialized!');
+            alert('All blood tests have been initialized with reference values!');
         });
         
         // Remove blood test

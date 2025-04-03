@@ -12,7 +12,31 @@ app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")  # Default f
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    # Define the predefined blood tests to match the JavaScript array
+    predefined_blood_tests = [
+        {"name": "RBC Erythrocytes", "unit": "million/µL", "ref_min": 4.2, "ref_max": 5.8},
+        {"name": "HGB Hemoglobin", "unit": "g/dL", "ref_min": 12.0, "ref_max": 15.5},
+        {"name": "HCT Hematocrit", "unit": "%", "ref_min": 36, "ref_max": 46},
+        {"name": "MCV Mean erythrocyte volume", "unit": "fL", "ref_min": 80, "ref_max": 100},
+        {"name": "MCH Mean hemoglobin mass in erythrocyte", "unit": "pg", "ref_min": 27, "ref_max": 33},
+        {"name": "MCHC Mean hemoglobin concentration in an erythrocyte", "unit": "g/dL", "ref_min": 32, "ref_max": 36},
+        {"name": "WBC Leukocytes", "unit": "thousands/µL", "ref_min": 4.5, "ref_max": 11.0},
+        {"name": "Neutrophils", "unit": "%", "ref_min": 40, "ref_max": 75},
+        {"name": "Lymphocytes", "unit": "%", "ref_min": 20, "ref_max": 45},
+        {"name": "Monocytes", "unit": "%", "ref_min": 2, "ref_max": 10},
+        {"name": "Eosinophils", "unit": "%", "ref_min": 1, "ref_max": 6},
+        {"name": "Basophils", "unit": "%", "ref_min": 0, "ref_max": 2},
+        {"name": "PLT Thrombocytes", "unit": "thousands/µL", "ref_min": 150, "ref_max": 450},
+        {"name": "MPV Mean platelet volume", "unit": "fL", "ref_min": 7.5, "ref_max": 11.5}
+    ]
+    
+    # Create form with the correct number of blood test entries
     form = MedicalDataForm()
+    
+    # Ensure we have the right number of blood test entries
+    # This will initialize the form with empty fields that will be filled by JavaScript
+    while len(form.blood_tests) < len(predefined_blood_tests):
+        form.blood_tests.append_entry()
     
     if request.method == 'POST':
         if form.validate():
