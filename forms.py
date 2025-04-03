@@ -40,7 +40,7 @@ class MedicalDataForm(FlaskForm):
     
     date_of_birth = DateField('Date of Birth (DD.MM.YYYY)', 
                               format='%d.%m.%Y',
-                              validators=[DataRequired()])
+                              validators=[DataRequired(message="Date of birth is required")])
     
     # Blood Test Results
     blood_tests = FieldList(FormField(BloodTestForm), min_entries=1)
@@ -110,5 +110,8 @@ class MedicalDataForm(FlaskForm):
     
     def validate_date_of_birth(self, field):
         """Validate date of birth is not in the future"""
-        if field.data > datetime.now().date():
-            raise ValidationError('Date of birth cannot be in the future')
+        try:
+            if field.data > datetime.now().date():
+                raise ValidationError('Date of birth cannot be in the future')
+        except Exception as e:
+            raise ValidationError('Please enter a valid date in DD.MM.YYYY format')

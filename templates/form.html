@@ -79,9 +79,14 @@
             <div class="card mb-4">
                 <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
                     <h3 class="mb-0">Blood Test Results</h3>
-                    <button type="button" class="btn btn-light" id="addBloodTest">
-                        <i class="fas fa-plus"></i> Add Test
-                    </button>
+                    <div>
+                        <button type="button" id="initializeBloodTests" class="btn btn-primary btn-sm me-2">
+                            <i class="fas fa-sync"></i> Initialize Tests
+                        </button>
+                        <button type="button" class="btn btn-light" id="addBloodTest">
+                            <i class="fas fa-plus"></i> Add Test
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div id="blood-tests-container">
@@ -96,7 +101,7 @@
                                         <th style="width: 15%">Unit</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="blood-tests-tbody">
                                     {% for blood_test in form.blood_tests %}
                                     <tr class="blood-test-entry">
                                         <td>
@@ -307,18 +312,60 @@
         if ($('#blood-tests-container .blood-test-entry').length === 0) {
             predefinedBloodTests.forEach((test, index) => {
                 const newTest = bloodTestTemplate.replace(/{index}/g, index);
-                $('#blood-tests-container').append(newTest);
+                $('#blood-tests-tbody').append(newTest);
                 
-                const entry = $($('#blood-tests-container .blood-test-entry')[index]);
+                const entry = $($('#blood-tests-tbody .blood-test-entry')[index]);
                 entry.find('.test-name').val(test.name);
                 entry.find('.test-unit').val(test.unit);
                 entry.find('.ref-min').val(test.refMin);
                 entry.find('.ref-max').val(test.refMax);
             });
+        } else {
+            // If blood test entries already exist, make sure they have proper test names and units
+            $('#blood-tests-tbody .blood-test-entry').each(function(index) {
+                if (index < predefinedBloodTests.length) {
+                    const test = predefinedBloodTests[index];
+                    const entry = $(this);
+                    
+                    // Only set the values if they're empty
+                    if (!entry.find('.test-name').val()) {
+                        entry.find('.test-name').val(test.name);
+                    }
+                    if (!entry.find('.test-unit').val()) {
+                        entry.find('.test-unit').val(test.unit);
+                    }
+                    if (!entry.find('.ref-min').val()) {
+                        entry.find('.ref-min').val(test.refMin);
+                    }
+                    if (!entry.find('.ref-max').val()) {
+                        entry.find('.ref-max').val(test.refMax);
+                    }
+                }
+            });
         }
         
         // Add new blood test button disabled since we're using predefined tests
-        $('#addBloodTest').prop('disabled', true).text('Using predefined blood tests').removeClass('btn-primary').addClass('btn-secondary');
+        $('#addBloodTest').prop('disabled', true).text('Using predefined tests').removeClass('btn-primary').addClass('btn-secondary');
+        
+        // Initialize blood tests button functionality
+        $('#initializeBloodTests').on('click', function() {
+            // Loop through each existing blood test entry and set values from predefined tests
+            $('#blood-tests-tbody .blood-test-entry').each(function(index) {
+                if (index < predefinedBloodTests.length) {
+                    const test = predefinedBloodTests[index];
+                    const entry = $(this);
+                    
+                    // Set the values regardless of whether they're empty or not
+                    entry.find('.test-name').val(test.name);
+                    entry.find('.test-unit').val(test.unit);
+                    entry.find('.ref-min').val(test.refMin);
+                    entry.find('.ref-max').val(test.refMax);
+                }
+            });
+            
+            // Display success message
+            alert('Blood test names, units, and reference values have been initialized!');
+        });
         
         // Remove blood test
         $(document).on('click', '.remove-blood-test', function() {
@@ -342,39 +389,12 @@
             });
         }
         
-        // Date input validation
-        $('#date_of_birth').on('blur', function() {
-            const value = $(this).val();
-            const dateRegex = /^(\d{2})\.(\d{2})\.(\d{4})$/;
-            
-            if (!dateRegex.test(value)) {
-                $(this).addClass('is-invalid');
-                if (!$(this).next('.invalid-feedback').length) {
-                    $(this).after('<div class="invalid-feedback">Please enter a valid date in DD.MM.YYYY format.</div>');
-                }
-            } else {
-                const matches = value.match(dateRegex);
-                const day = parseInt(matches[1], 10);
-                const month = parseInt(matches[2], 10);
-                const year = parseInt(matches[3], 10);
-                
-                // Check if date is valid
-                const date = new Date(year, month - 1, day);
-                if (
-                    date.getDate() !== day ||
-                    date.getMonth() + 1 !== month ||
-                    date.getFullYear() !== year ||
-                    date > new Date()
-                ) {
-                    $(this).addClass('is-invalid');
-                    if (!$(this).next('.invalid-feedback').length) {
-                        $(this).after('<div class="invalid-feedback">Please enter a valid date that is not in the future.</div>');
-                    }
-                } else {
-                    $(this).removeClass('is-invalid');
-                    $(this).next('.invalid-feedback').remove();
-                }
-            }
+        // Date input validation - removed client-side validation to allow server-side validation to work
+        // We'll keep the format guidance visible but not enforce it with JS
+        $('#date_of_birth').on('input', function() {
+            // Remove any validation error messages added by JS
+            $(this).removeClass('is-invalid');
+            $(this).siblings('.invalid-feedback').remove();
         });
         
         // Form validation
