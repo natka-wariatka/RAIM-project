@@ -38,9 +38,11 @@ class MedicalDataForm(FlaskForm):
                          choices=[('', 'Select Gender'), ('female', 'Female'), ('male', 'Male')],
                          validators=[DataRequired()])
     
-    date_of_birth = DateField('Date of Birth (DD.MM.YYYY)', 
-                              format='%d.%m.%Y',
-                              validators=[DataRequired(message="Date of birth is required")])
+    date_of_birth = StringField('Date of Birth (DD.MM.YYYY)', 
+                              validators=[
+                                  DataRequired(message="Date of birth is required"),
+                                  Regexp(r'^(\d{2})\.(\d{2})\.(\d{4})$', message="Please use DD.MM.YYYY format")
+                              ])
     
     # Blood Test Results
     blood_tests = FieldList(FormField(BloodTestForm), min_entries=1)
@@ -111,7 +113,13 @@ class MedicalDataForm(FlaskForm):
     def validate_date_of_birth(self, field):
         """Validate date of birth is not in the future"""
         try:
-            if field.data > datetime.now().date():
+            # Parse the date string into components
+            day, month, year = field.data.split('.')
+            # Create a datetime object
+            date_obj = datetime(int(year), int(month), int(day)).date()
+            # Check if it's in the future
+            if date_obj > datetime.now().date():
                 raise ValidationError('Date of birth cannot be in the future')
-        except Exception as e:
-            raise ValidationError('Please enter a valid date in DD.MM.YYYY format')
+        except ValueError:
+            # This will catch invalid dates like 31.02.2020
+            raise ValidationError('Please enter a valid date')

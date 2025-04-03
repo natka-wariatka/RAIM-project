@@ -22,7 +22,7 @@ def index():
                     'first_name': form.first_name.data,
                     'last_name': form.last_name.data,
                     'gender': form.gender.data,
-                    'date_of_birth': form.date_of_birth.data.strftime('%d.%m.%Y') if form.date_of_birth.data else None
+                    'date_of_birth': form.date_of_birth.data
                 },
                 'blood_tests': [
                     {
