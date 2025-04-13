@@ -8,7 +8,7 @@ class BloodTestForm(FlaskForm):
     """Form for a single blood test result"""
     test_name = StringField('Test Name', validators=[DataRequired()])
     result = FloatField('Result', validators=[DataRequired()])
-    ref_min = FloatField('Reference Min', validators=[Optional()]) # Allow None/empty, will be set to 0
+    ref_min = FloatField('Reference Min', validators=[Optional()]) # optional, allow None/empty, will be set to 0
     ref_max = FloatField('Reference Max', validators=[DataRequired()])
     unit = StringField('Unit', validators=[DataRequired()])
     
@@ -19,7 +19,8 @@ class BloodTestForm(FlaskForm):
             field.data = 0.0
     
     class Meta:
-        # Disable CSRF for nested form
+        # Disable CSRF for nested form (flask doesn't properly handle multiple tokens in nested forms,
+        # and without this exclusion, the form didn't pass validation even though the data was correct)
         csrf = False
 
 class MultiCheckboxField(SelectMultipleField):
@@ -30,11 +31,11 @@ class MultiCheckboxField(SelectMultipleField):
         pass
         
     def process_formdata(self, valuelist):
-        # Allow empty checkbox selections
+        # Allow empty checkbox selections, rewrite data from form to self.data
         self.data = valuelist
 
 class MedicalDataForm(FlaskForm):
-    """Form for collecting medical data"""
+    """Main form for collecting medical data"""
     # Personal Information
     first_name = StringField('First Name', 
                              validators=[DataRequired(), 

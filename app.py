@@ -30,19 +30,19 @@ def index():
         {"name": "MPV Mean platelet volume", "unit": "fL", "ref_min": 7.5, "ref_max": 11.5}
     ]
     
-    # Create form with the correct number of blood test entries
+    # Create empty form based on definition from forms.py
     form = MedicalDataForm()
     
-    # Ensure we have the right number of blood test entries
+    # adds the right number of blood tests entries corresponding to the definition from forms.py
     # This will initialize the form with empty fields that will be filled by JavaScript
     while len(form.blood_tests) < len(predefined_blood_tests):
         form.blood_tests.append_entry()
     
     if request.method == 'POST':
         # Log form submission
-        logging.debug(f"Form submitted with data: {request.form}")
+        logging.debug(f"Form submitted with data: {request.form}") #Prints the contents of the form to the console - for debugging
         
-        # Check for validation errors and log them
+        # Check for validation errors and log them - if the form didn't pass validation (e.g. missing required data), prints errors to flash and returns to the form
         if not form.validate_on_submit():
             logging.debug(f"Form validation errors: {form.errors}")
             for field, errors in form.errors.items():
