@@ -1,7 +1,10 @@
 import os
 import logging
-from flask import Flask, render_template, redirect, url_for, flash, request, session
+from flask import Flask, render_template, redirect, url_for, flash, request, session, send_file
 from forms import MedicalDataForm
+import json
+import io
+
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -102,6 +105,25 @@ def results():
         return redirect(url_for('index'))
     
     return render_template('results.html', data=form_data)
+
+@app.route('/export-json')
+def export_json():
+    data = session.get('form_data')  # lub inny sposób, jak zapisujesz dane
+    if not data:
+        return "No data available", 400
+
+    json_str = json.dumps(data, indent=4)
+    buffer = io.BytesIO()
+    buffer.write(json_str.encode('utf-8'))
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name='medical_form_results.json',
+        mimetype='application/json'
+    )
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
