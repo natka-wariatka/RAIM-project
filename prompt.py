@@ -4,21 +4,26 @@ def medically_relevant_response(user_input):
         ```
         {user_input}
         ```
-        Your task is to find out if the message contains any medical symptoms, health issues,
-        any kind of medical data. Any description of feeling unwell or being in pain. 
-        if so then you should output only in `True` or `False`.
+        Determine whether the user's input is medically relevant.
+        output only in `True` if it is medically relevant or `False` if it is not.
     """
     return medically_relevant
 
 def medical_interview_response(user_input, history):
     medical_interview=f"""
-        Here is the prompt from user:
+        The user described the following health issue:
     
-        {user_input} and session history: {history}
+        {user_input} and here are the previous answers: {history}
         
-        Your task is to act like medical assistant and you have to find out about user symptoms and other important medical data.
-        You should ask follow up questions if necessary. Treat user with empathy and understanding. Don't answer too long though. 
-        
+        Your task is to act like a friendly medical assistant.
+        Generate 2 to 4 clear, medically relevant follow-up questions to gather more information. 
+        The goal is to understand the user's symptoms better in terms of:
+        - Duration and onset
+        - Severity
+        - Location
+        - Accompanying symptoms
+        - Relevant lifestyle or medical history
+        Keep your questions medium length, don't use too long sentences. 
         """
     return medical_interview
 
@@ -28,16 +33,29 @@ def diagnosis_possible_response(history):
         
         {history}
     
-        Your task is to analyse user answers and determinate whether there is enough to provide diagnosis and recommended specialist or not.
+        Decide if there is enough information to suggest possible causes of the health issues.
         Your should output only in `True` or `False`.
         """
     return diagnosis_possible
 
-def diagnosis(history):
+def diagnosis(history, specialist_list):
     diagnosis_response = f"""
         
         Here is the history of users answers:
         {history}
         
-        Your task is to provide possible diagnosis with the percentage and recommended doctors. """
+        Generate 3 to 4 most likely causes for the user's condition. Include:
+        - A short name for the condition
+        - Estimated likelihood as a percentage (add up to ~100%)
+        - Short explanation (1–2 sentences)
+        - Recommended type of medical specialist
+        When suggesting a specialist, choose one from the following list only:
+        {specialist_list}
+
+        
+        Respond in this format:
+        
+        1. Condition Name (XX%) - Explanation.
+           Suggested Specialist: [Type of Specialist]
+        """
     return diagnosis_response

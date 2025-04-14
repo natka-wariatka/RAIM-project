@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+    const socket = io(); // Connect to the server
     const userInput = document.getElementById("userInput");
     const sendBtn = document.getElementById("sendBtn");
     const diagnoseBtn = document.getElementById("diagnoseBtn");
@@ -7,37 +8,25 @@ document.addEventListener("DOMContentLoaded", () => {
     function addMessage(role, text) {
         const message = document.createElement("div");
         message.classList.add(role);
-        message.innerHTML = `<strong>${role === 'user' ? 'Ty' : 'Asystent'}:</strong> ${text}`;
+        message.innerHTML = `<strong>${role === 'user' ? 'You' : 'Assistant'}:</strong> ${text}`;
         chatbox.appendChild(message);
         chatbox.scrollTop = chatbox.scrollHeight;
     }
 
-    async function sendMessage() {
+    sendBtn.addEventListener("click", () => {
         const text = userInput.value.trim();
         if (!text) return;
 
-        addMessage('user', text);
+        addMessage("user", text);
+        socket.emit("user_message", { text });
         userInput.value = "";
+    });
 
-        const response = await fetch("/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text })
-        });
+    diagnoseBtn.addEventListener("click", () => {
+        socket.emit("diagnose_request");
+    });
 
-        const data = await response.json();
-        addMessage('assistant', data.response);
-    }
-
-    async function sendDiagnosis() {
-        const response = await fetch("/diagnose", {
-            method: "POST"
-        });
-
-        const data = await response.json();
-        addMessage('assistant', data.response);
-    }
-
-    sendBtn.addEventListener("click", sendMessage);
-    diagnoseBtn.addEventListener("click", sendDiagnosis);
+    socket.on("bot_response", (data) => {
+        addMessage("assistant", data.response);
+    });
 });

@@ -1,3 +1,5 @@
+import eventlet
+eventlet.monkey_patch()
 from langchain_ollama import OllamaLLM
 from langchain_core.output_parsers import StrOutputParser
 from flask import Flask, request, render_template, session, jsonify
@@ -6,15 +8,29 @@ import logging
 import re
 import datetime
 import prompt
-
-
-logging.basicConfig(level=logging.DEBUG)
+from flask_socketio import SocketIO, emit
 app = Flask(__name__)
 
-#konfiguracja sesji użytkownika
+socketio = SocketIO(app, manage_session=True)
+
+logging.basicConfig(level=logging.DEBUG)
+
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_PERMANENT"] = False
 Session(app)
+
+specialists_list = [
+    "General Practitioner",
+    "Neurologist",
+    "Dermatologist",
+    "Cardiologist",
+    "ENT Specialist",
+    "Psychiatrist",
+    "Endocrinologist",
+    "Pulmonologist",
+    "Rheumatologist",
+    "Gastroenterologist"
+]
 
 def format_output(text):
     return re.sub(r'\*\*(.*?)\*\*', r'<strong>\1</strong>', text)
@@ -43,6 +59,20 @@ def chat():
     response = chatbot_process(user_input)
     return jsonify({'response': response})
 
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected')
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
+
+@socketio.on('user_message')
+def handle_user_message(data):
+    user_input = data['text']
+    response = chatbot_process(user_input)
+    emit('bot_response', {'response': response})
+
 def chatbot_process(user_input):
     relevance_check = prompt.medically_relevant_response(user_input)
     relevance_response = chatbot_pipeline.invoke(relevance_check)
@@ -70,20 +100,35 @@ def chatbot_process(user_input):
 def diagnose():
     history = session.get('history', [])
     if not history:
-        return jsonify({'response': "I'm afarid I need more info for proper diagnosis"})
+        return jsonify({'response': "I am afraid I need more info for proper diagnosis"})
 
     prompt_possible = prompt.diagnosis_possible_response(history)
     possible_response = chatbot_pipeline.invoke(prompt_possible)
 
     if 'true' in possible_response.lower():
-        diagnosis_prompt = prompt.diagnosis(history)
+        diagnosis_prompt = prompt.diagnosis(history, specialists_list)
         diagnosis_result = chatbot_pipeline.invoke(diagnosis_prompt)
         return jsonify({'response': diagnosis_result})
     else:
-        return jsonify({'response': "I'm afarid I need more info for proper diagnosis"})
+        return jsonify({'response': "I am afraid I need more info for proper diagnosis"})
 
+@socketio.on('diagnose_request')
+def handle_diagnose():
+    history = session.get('history', [])
+    if not history:
+        emit('bot_response', {'response': "I am afraid I need more info for proper diagnosis"})
+        return
 
-# Zapisywanie sesji użytkownika
+    prompt_possible = prompt.diagnosis_possible_response(history)
+    possible_response = chatbot_pipeline.invoke(prompt_possible)
+
+    if 'true' in possible_response.lower():
+        diagnosis_prompt = prompt.diagnosis(history, specialists_list)
+        diagnosis_result = chatbot_pipeline.invoke(diagnosis_prompt)
+        emit('bot_response', {'response': diagnosis_result})
+    else:
+        emit('bot_response', {'response': "I am afraid I need more info for proper diagnosis"})
+
 def add_to_history(role, content):
     if 'history' not in session:
         session['history'] = [{'role': 'system',
@@ -92,4 +137,4 @@ def add_to_history(role, content):
     session.modified = True
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    socketio.run(app, host='0.0.0.0', port=5050, debug=True)
