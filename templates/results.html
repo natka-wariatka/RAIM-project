@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card shadow">
+    <div class="card-header bg-success text-white">
+        <h2 class="mb-0">
+            <i class="fas fa-clipboard-check me-2"></i>
+            Form Submission Successful
+        </h2>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-success mb-4">
+            <i class="fas fa-check-circle me-2"></i>
+            Your medical data has been successfully submitted. Below is a summary of the information provided.
+        </div>
+
+        <!-- Personal Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0">Personal Information</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>First Name:</strong> {{ data.personal_info.first_name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Last Name:</strong> {{ data.personal_info.last_name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Gender:</strong> {{ data.personal_info.gender|capitalize }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Date of Birth:</strong> {{ data.personal_info.date_of_birth }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blood Test Results -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0">Blood Test Results</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Test Name</th>
+                                <th>Result</th>
+                                <th>Unit</th>
+                                <th>Reference Min</th>
+                                <th>Reference Max</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for test in data.blood_tests %}
+                            <tr>
+                                <td>{{ test.test_name }}</td>
+                                <td><strong>{{ test.result }}</strong></td>
+                                <td>{{ test.unit }}</td>
+                                <td>{{ test.ref_min }}</td>
+                                <td>{{ test.ref_max }}</td>
+                                <td>
+                                    {% if test.result < test.ref_min %}
+                                        <span class="badge bg-warning">Below Reference</span>
+                                    {% elif test.result > test.ref_max %}
+                                        <span class="badge bg-danger">Above Reference</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Normal</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Symptom Duration -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0">Symptom Duration</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Length of Symptoms:</strong> {{ data.symptom_duration|replace('_', ' ')|capitalize }}</p>
+            </div>
+        </div>
+
+        <!-- Symptoms -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0">Reported Symptoms</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- General Symptoms -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-secondary">
+                                <h4 class="mb-0">General Symptoms</h4>
+                            </div>
+                            <div class="card-body">
+                                {% if data.general_symptoms %}
+                                    <ul class="list-group">
+                                        {% for symptom in data.general_symptoms %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ symptom|replace('_', ' ')|capitalize }}
+                                                <span class="badge bg-primary rounded-pill">
+                                                    <i class="fas fa-check"></i>
+                                                </span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="text-muted">No general symptoms reported.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Respiratory Symptoms -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-secondary">
+                                <h4 class="mb-0">Respiratory Symptoms</h4>
+                            </div>
+                            <div class="card-body">
+                                {% if data.respiratory_symptoms %}
+                                    <ul class="list-group">
+                                        {% for symptom in data.respiratory_symptoms %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ symptom|replace('_', ' ')|capitalize }}
+                                                <span class="badge bg-primary rounded-pill">
+                                                    <i class="fas fa-check"></i>
+                                                </span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="text-muted">No respiratory symptoms reported.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Circulatory Symptoms -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-secondary">
+                                <h4 class="mb-0">Circulatory Symptoms</h4>
+                            </div>
+                            <div class="card-body">
+                                {% if data.circulatory_symptoms %}
+                                    <ul class="list-group">
+                                        {% for symptom in data.circulatory_symptoms %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ symptom|replace('_', ' ')|capitalize }}
+                                                <span class="badge bg-primary rounded-pill">
+                                                    <i class="fas fa-check"></i>
+                                                </span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="text-muted">No circulatory symptoms reported.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Digestive Symptoms -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-secondary">
+                                <h4 class="mb-0">Digestive Symptoms</h4>
+                            </div>
+                            <div class="card-body">
+                                {% if data.digestive_symptoms %}
+                                    <ul class="list-group">
+                                        {% for symptom in data.digestive_symptoms %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ symptom|replace('_', ' ')|capitalize }}
+                                                <span class="badge bg-primary rounded-pill">
+                                                    <i class="fas fa-check"></i>
+                                                </span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="text-muted">No digestive symptoms reported.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Neurological Symptoms -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-secondary">
+                                <h4 class="mb-0">Neurological Symptoms</h4>
+                            </div>
+                            <div class="card-body">
+                                {% if data.neurological_symptoms %}
+                                    <ul class="list-group">
+                                        {% for symptom in data.neurological_symptoms %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ symptom|replace('_', ' ')|capitalize }}
+                                                <span class="badge bg-primary rounded-pill">
+                                                    <i class="fas fa-check"></i>
+                                                </span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="text-muted">No neurological symptoms reported.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dermatological Symptoms -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-secondary">
+                                <h4 class="mb-0">Dermatological Symptoms</h4>
+                            </div>
+                            <div class="card-body">
+                                {% if data.dermatological_symptoms %}
+                                    <ul class="list-group">
+                                        {% for symptom in data.dermatological_symptoms %}
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                {{ symptom|replace('_', ' ')|capitalize }}
+                                                <span class="badge bg-primary rounded-pill">
+                                                    <i class="fas fa-check"></i>
+                                                </span>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="text-muted">No dermatological symptoms reported.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <a href="{{ url_for('index') }}" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-2"></i> Submit New Form
+            </a>
+            <button class="btn btn-secondary" onclick="window.print()">
+                <i class="fas fa-print me-2"></i> Print Results
+            </button>
+            <a href="{{ url_for('export_json') }}" class="btn btn-success">
+                <i class="fas fa-file-export me-2"></i> Export to JSON
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
