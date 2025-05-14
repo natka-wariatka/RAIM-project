@@ -1,6 +1,9 @@
 import eventlet
 eventlet.monkey_patch()
 
+from dotenv import load_dotenv
+load_dotenv('open_ai.env')
+
 import os
 import json
 import io
@@ -10,7 +13,7 @@ import datetime
 from flask import Flask, render_template, redirect, url_for, flash, request, session, send_file, jsonify
 from flask_session import Session
 from flask_socketio import SocketIO, emit
-from langchain_ollama import OllamaLLM
+from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from forms import MedicalDataForm
 import prompt
@@ -35,17 +38,20 @@ specialists_list = [
     "Rheumatologist", "Gastroenterologist"
 ]
 
-# Inicjalizacja pipeline LLaMA3
-def init_llama3():
+# OpenAI
+def init_openai():
     try:
-        model = OllamaLLM(model="llama3.2")
+        model = ChatOpenAI(
+            model="gpt-4",  # lub "gpt-3.5-turbo"
+            temperature=0.7,
+            api_key=os.environ.get("OPENAI_API_KEY")
+        )
         parser = StrOutputParser()
         return model | parser
     except Exception as e:
         logging.error(f"Failed to initialize chatbot pipeline: {e}")
         raise
-
-chatbot_pipeline = init_llama3()
+chatbot_pipeline = init_openai()
 
 def add_to_history(role, content):
     if 'history' not in session:
@@ -70,6 +76,7 @@ def chatbot_process(user_input):
 # Strona startowa z formularzem
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    print("render")
     predefined_blood_tests = [  # Tabela referencyjna
         {"name": "RBC Erythrocytes", "unit": "million/\u00b5L", "ref_min": 4.2, "ref_max": 5.8},
         {"name": "HGB Hemoglobin", "unit": "g/dL", "ref_min": 12.0, "ref_max": 15.5},
@@ -209,4 +216,4 @@ def handle_diagnose():
         emit('bot_response', {'response': "I am afraid I need more info for proper diagnosis"})
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=5001, debug=True)
+    socketio.run(app, host='127.0.0.1', port=5001, debug=True)
