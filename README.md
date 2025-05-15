@@ -74,11 +74,11 @@ Wykorzystywane technologie to:
 
 1. Sklonuj repozytorium:
     ```bash
-    git clone https://github.com/twoje-repo.git
+    git clone https://github.com/natka-wariatka/RAIM-project.git
     ```
 2. Przejdź do katalogu projektu:
     ```bash
-    cd twoj-projekt
+    cd RAIM-project
     ```
 3. Zainstaluj zależności:
     ```bash
