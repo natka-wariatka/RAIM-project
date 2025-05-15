@@ -1,127 +1,84 @@
-/* Custom styles for Medical Data Form */
+/* Custom styles for the Hospital Appointment System */
 
-/* Form styling */
-.form-group {
-    margin-bottom: 1rem;
-}
-
-/* Card styling */
-.card {
-    border-radius: 0.5rem;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    margin-bottom: 1.5rem;
-}
-
-.card-header {
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
-}
-
-/* Blood test entry styling */
-.blood-test-entry {
-    transition: all 0.3s ease;
-}
-
-.blood-test-entry.border-danger {
-    border: 2px solid var(--bs-danger) !important;
-}
-
-.test-title {
+/* General styling */
+body {
+    min-height: 100vh;
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    line-height: 1.4;
+    flex-direction: column;
 }
 
-.test-name {
+/* Appointment table styling */
+.appointment-table th,
+.appointment-table td {
+    vertical-align: middle;
+}
+
+/* Make sure the calendar dates are nicely formatted */
+.appointment-date {
     font-weight: bold;
-    margin-right: 5px;
-    display: inline;
+    background-color: var(--bs-gray-800);
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 12px;
 }
 
-.test-unit {
-    color: var(--bs-secondary);
-    display: inline;
-    width: auto !important;
+/* Appointment card styling */
+.appointment-card {
+    transition: transform 0.2s;
+    cursor: pointer;
 }
 
-input.form-control-plaintext {
-    background: transparent;
-    border: none;
-    padding: 0;
-    outline: none;
+.appointment-card:hover {
+    transform: translateY(-5px);
 }
 
-/* Checkbox styling */
-.form-check {
+/* Calendar styling */
+.calendar-container {
+    margin-bottom: 2rem;
+}
+
+.calendar-header {
+    font-weight: bold;
     padding: 0.5rem;
-    border-radius: 0.25rem;
-    transition: background-color 0.2s;
-    display: flex;
-    align-items: center;
+    background-color: var(--bs-gray-800);
+    border-radius: 4px;
 }
 
-.form-check:hover {
-    background-color: rgba(var(--bs-info-rgb), 0.1);
+.calendar-day-btn {
+    position: relative;
+    height: 48px;
+    font-weight: bold;
 }
 
-.form-check input[type="checkbox"] {
-    margin-right: 0.5rem;
+.calendar-day-btn .badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 0.7rem;
 }
 
-.form-check-label {
-    margin-left: 0.5rem;
-    user-select: none;
+.calendar-day-btn.has-appointments {
+    background-color: var(--bs-success);
+    color: white;
 }
 
-/* Symptom groups */
-.symptom-group h4 {
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(var(--bs-secondary-rgb), 0.2);
-    margin-bottom: 1rem;
+.calendar-grid {
+    margin-top: 1rem;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .card-body {
-        padding: 1rem;
+/* Success and error icon animation */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
     }
-
-    h3 {
-        font-size: 1.5rem;
+    50% {
+        transform: scale(1.1);
     }
-
-    h4 {
-        font-size: 1.25rem;
+    100% {
+        transform: scale(1);
     }
 }
 
-/* Print styles */
-@media print {
-    body {
-        background-color: white;
-        color: black;
-    }
-
-    .card {
-        border: 1px solid #ddd;
-        box-shadow: none;
-    }
-
-    .card-header {
-        background-color: #f8f9fa !important;
-        color: #333 !important;
-    }
-
-    .btn {
-        display: none;
-    }
-
-    .badge {
-        border: 1px solid #333;
-    }
-
-    .list-group-item {
-        border-color: #ddd;
-    }
+.text-success, .text-danger {
+    animation: pulse 1.5s infinite;
 }

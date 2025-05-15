@@ -1,14 +1,15 @@
 [project]
-name = "MedicalIntelligenceAssistant"
+name = "repl-nix-workspace"
 version = "0.1.0"
-description = "RAIM Project - Medical Intelligence Assistant by Natalia Askierko & Julia Młynarczyk"
+description = "Add your description here"
 requires-python = ">=3.11"
 dependencies = [
     "email-validator>=2.2.0",
-    "flask-wtf>=1.2.2",
-    "flask>=3.1.0",
+    "flask>=3.1.1",
     "flask-sqlalchemy>=3.1.1",
     "gunicorn>=23.0.0",
     "psycopg2-binary>=2.9.10",
-    "wtforms>=3.2.1",
+    "python-dateutil>=2.9.0.post0",
+    "sqlalchemy>=2.0.41",
+    "werkzeug>=3.1.3",
 ]
