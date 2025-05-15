@@ -170,7 +170,7 @@ def chat_view():
     add_to_history('user', intro_text)
     add_to_history('assistant', chatbot_pipeline.invoke(prompt.medical_interview_response(intro_text, session['history'])))
 
-    return render_template('index_chatbot.html')  # Musisz stworzyć ten widok
+    return render_template('index_chatbot.html')
 
 @app.route('/chat', methods=['POST'])
 def chat_route():

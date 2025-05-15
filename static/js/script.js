@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const socket = io(); // Connect to the server
-    const userInput = document.getElementById("userInput");
+    const textarea = document.getElementById("userInput");
     const sendBtn = document.getElementById("sendBtn");
     const diagnoseBtn = document.getElementById("diagnoseBtn");
     const chatbox = document.getElementById("chatbox");
@@ -41,8 +41,15 @@ document.addEventListener("DOMContentLoaded", () => {
         addMessage("assistant", data.response);
     });
 
-    // Obsługa Enter do wysyłania wiadomości
-    userInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") sendBtn.click();
+    textarea.addEventListener("input", () => {
+        textarea.style.height = 'auto';  // Reset height
+        textarea.style.height = textarea.scrollHeight + 'px';  // Expand to fit
+    });
+
+    textarea.addEventListener("keydown", function(e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();  // Prevent newline
+            document.getElementById("sendBtn").click();  // Trigger send button
+        }
     });
 });

@@ -9,7 +9,6 @@ def medically_relevant_response(user_input):
     """
     return medically_relevant
 
-
 def medical_interview_response(user_input, history):
     medical_interview = f"""
         The user described the following health issue:
@@ -17,7 +16,8 @@ def medical_interview_response(user_input, history):
         {user_input} and here are the previous answers: {history}
 
         Your task is to act like a friendly medical assistant.
-        Generate 2 to 4 clear, medically relevant follow-up questions to gather more information. 
+        Generate medically relevant follow-up questions to gather more information. 
+        Take under the consideration the previous answers. If there is an "intro text" in history session try to focus on medical data provided.
         The goal is to understand the user's symptoms better in terms of:
         - Duration and onset
         - Severity
