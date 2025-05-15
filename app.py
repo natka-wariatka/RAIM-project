@@ -543,7 +543,7 @@ def admin_get_patient_appointments():
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
 
 if __name__ == '__main__':
-    socketio.run(app, host='127.0.0.1', port=5001, debug=True)
+    socketio.run(app, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
 
 #TODO usunięcie sesji po zakończeniu rozmowy z czatem/utworzeniu rezerwacji
 #TODO dodanie przycisku powrót do formularza w sekcji chatbota
