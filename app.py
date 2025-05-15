@@ -144,7 +144,6 @@ def chat_view():
     if not form_data:
         return render_template('index_chatbot.html')
 
-    # Dodajemy dane JSON do wstępnej sesji chatbota
     intro_text = f"The following medical data has been provided:\n{json.dumps(form_data, indent=2)}"
     add_to_history('user', intro_text)
     add_to_history('assistant', chatbot_pipeline.invoke(prompt.medical_interview_response(intro_text, session['history'])))
@@ -186,6 +185,7 @@ def handle_user_message(data):
     response = chatbot_process(user_input)
     emit('bot_response', {'response': response})
 
+
 @socketio.on('diagnose_request')
 def handle_diagnose():
     history = session.get('history', [])
@@ -200,3 +200,7 @@ def handle_diagnose():
 
 if __name__ == '__main__':
     socketio.run(app, host='127.0.0.1', port=5001, debug=True)
+
+#TODO usunięcie sesji po zakończeniu rozmowy z czatem
+#TODO dodanie przycisku powrót do formularza w sekcji chatbota
+#TODO dodanie fixed messege po uzupełnieniu formularza
