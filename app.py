@@ -53,26 +53,6 @@ def init_openai():
         raise
 chatbot_pipeline = init_openai()
 
-def add_to_history(role, content):
-    if 'history' not in session:
-        session['history'] = [{
-            'role': 'system',
-            'content': f'Today is {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}. Think carefully.'
-        }]
-    session['history'].append({'role': role, 'content': content})
-    session.modified = True
-
-def chatbot_process(user_input):
-    relevance_response = chatbot_pipeline.invoke(prompt.medically_relevant_response(user_input))
-    if 'true' not in relevance_response.lower():
-        return "I'm sorry, I am a medical assistant. Do you want to talk about any medical issues?"
-
-    add_to_history('user', user_input)
-    history = session.get('history', [])[-10:] or [{'role': 'system', 'content': 'Initial conversation'}]
-    interview_response = chatbot_pipeline.invoke(prompt.medical_interview_response(user_input, history))
-    add_to_history('assistant', interview_response)
-    return interview_response
-
 # Strona startowa z formularzem
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -162,8 +142,7 @@ def export_json():
 def chat_view():
     form_data = session.get('form_data')
     if not form_data:
-        flash('No medical data found in session.', 'danger')
-        return redirect(url_for('index'))
+        return render_template('index_chatbot.html')
 
     # Dodajemy dane JSON do wstępnej sesji chatbota
     intro_text = f"The following medical data has been provided:\n{json.dumps(form_data, indent=2)}"
@@ -172,21 +151,25 @@ def chat_view():
 
     return render_template('index_chatbot.html')
 
-@app.route('/chat', methods=['POST'])
-def chat_route():
-    user_input = request.json['text']
-    response = chatbot_process(user_input)
-    return jsonify({'response': response})
+def add_to_history(role, content):
+    if 'history' not in session:
+        session['history'] = [{
+            'role': 'system',
+            'content': f'Today is {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}. Think carefully.'
+        }]
+    session['history'].append({'role': role, 'content': content})
+    session.modified = True
 
-@app.route('/diagnose', methods=['POST'])
-def diagnose():
-    history = session.get('history', [])
-    if not history:
-        return jsonify({'response': "I am afraid I need more info for proper diagnosis"})
-    if 'true' in chatbot_pipeline.invoke(prompt.diagnosis_possible_response(history)).lower():
-        result = chatbot_pipeline.invoke(prompt.diagnosis(history, specialists_list))
-        return jsonify({'response': result})
-    return jsonify({'response': "I am afraid I need more info for proper diagnosis"})
+def chatbot_process(user_input):
+    relevance_response = chatbot_pipeline.invoke(prompt.medically_relevant_response(user_input))
+    if 'true' not in relevance_response.lower():
+        return "I'm sorry, I am a medical assistant. Do you want to talk about any medical issues?"
+
+    add_to_history('user', user_input)
+    history = session.get('history', [])[-10:] or [{'role': 'system', 'content': 'Initial conversation'}]
+    interview_response = chatbot_pipeline.invoke(prompt.medical_interview_response(user_input, history))
+    add_to_history('assistant', interview_response)
+    return interview_response
 
 # SocketIO handlers
 @socketio.on('connect')
