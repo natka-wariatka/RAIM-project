@@ -1,0 +1,642 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+    .nav-tabs .nav-link {
+        color: var(--bs-gray-600);
+    }
+    .nav-tabs .nav-link.active {
+        color: var(--bs-primary);
+        font-weight: bold;
+    }
+    .appointment-actions button {
+        margin-right: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-user-cog me-2"></i>Administrator Dashboard</h2>
+    <div>
+        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary me-2">
+            <i class="fas fa-home me-1"></i>Home
+        </a>
+        <a href="{{ url_for('admin_logout') }}" class="btn btn-outline-danger">
+            <i class="fas fa-sign-out-alt me-1"></i>Logout
+        </a>
+    </div>
+</div>
+
+<ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab" aria-controls="appointments" aria-selected="true">
+            <i class="fas fa-calendar-check me-1"></i>All Appointments
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="reservations-tab" data-bs-toggle="tab" data-bs-target="#reservations" type="button" role="tab" aria-controls="reservations" aria-selected="false">
+            <i class="fas fa-calendar-alt me-1"></i>Booked Appointments
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="patients-tab" data-bs-toggle="tab" data-bs-target="#patients" type="button" role="tab" aria-controls="patients" aria-selected="false">
+            <i class="fas fa-users me-1"></i>Patients
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="doctors-tab" data-bs-toggle="tab" data-bs-target="#doctors" type="button" role="tab" aria-controls="doctors" aria-selected="false">
+            <i class="fas fa-user-md me-1"></i>Doctors
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="adminTabContent">
+    <!-- All Appointments Tab -->
+    <div class="tab-pane fade show active" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="h5 mb-0">All Appointments</h3>
+                <div class="d-flex">
+                    <select class="form-select form-select-sm me-2" id="appointment-filter-doctor">
+                        <option value="">Filter by Doctor</option>
+                        {% for doctor in doctors %}
+                        <option value="{{ doctor.id }}">{{ doctor.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <select class="form-select form-select-sm me-2" id="appointment-filter-status">
+                        <option value="">Filter by Status</option>
+                        <option value="available">Available</option>
+                        <option value="booked">Booked</option>
+                    </select>
+                    <input type="date" class="form-control form-control-sm" id="appointment-filter-date">
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="appointments-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Doctor</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for appointment in appointments %}
+                            <tr data-appointment-id="{{ appointment.id }}" class="appointment-row {% if appointment.is_booked %}table-light{% endif %}" data-doctor-id="{{ appointment.doctor_id }}" data-status="{{ 'booked' if appointment.is_booked else 'available' }}" data-date="{{ appointment.start_time.strftime('%Y-%m-%d') }}">
+                                <td>{{ appointment.formatted_date }}</td>
+                                <td>{{ appointment.formatted_time }}</td>
+                                <td>{{ doctors_dict[appointment.doctor_id].full_name }}</td>
+                                <td>
+                                    {% if appointment.is_booked %}
+                                    <span class="badge bg-secondary">Booked</span>
+                                    {% else %}
+                                    <span class="badge bg-success">Available</span>
+                                    {% endif %}
+                                </td>
+                                <td class="appointment-actions">
+                                    {% if appointment.is_booked %}
+                                    <button class="btn btn-sm btn-danger cancel-reservation" data-appointment-id="{{ appointment.id }}" data-reservation-id="{{ appointment.reservation.id }}">
+                                        <i class="fas fa-times me-1"></i>Cancel
+                                    </button>
+                                    <button class="btn btn-sm btn-info view-patient" data-patient-id="{{ appointment.reservation.patient_id }}">
+                                        <i class="fas fa-user me-1"></i>Patient
+                                    </button>
+                                    {% else %}
+                                    <button class="btn btn-sm btn-danger delete-appointment" data-appointment-id="{{ appointment.id }}">
+                                        <i class="fas fa-trash me-1"></i>Delete
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reservations Tab -->
+    <div class="tab-pane fade" id="reservations" role="tabpanel" aria-labelledby="reservations-tab">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="h5 mb-0">Booked Appointments</h3>
+                <div class="d-flex">
+                    <select class="form-select form-select-sm me-2" id="reservation-filter-doctor">
+                        <option value="">Filter by Doctor</option>
+                        {% for doctor in doctors %}
+                        <option value="{{ doctor.id }}">{{ doctor.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="date" class="form-control form-control-sm" id="reservation-filter-date">
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="reservations-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Doctor</th>
+                                <th>Patient</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reservation in reservations %}
+                            <tr data-reservation-id="{{ reservation.id }}" class="reservation-row" data-doctor-id="{{ reservation.appointment.doctor_id }}" data-date="{{ reservation.appointment.start_time.strftime('%Y-%m-%d') }}">
+                                <td>{{ reservation.appointment.formatted_date }}</td>
+                                <td>{{ reservation.appointment.formatted_time }}</td>
+                                <td>{{ doctors_dict[reservation.appointment.doctor_id].full_name }}</td>
+                                <td>{{ reservation.patient.full_name }}</td>
+                                <td class="reservation-actions">
+                                    <button class="btn btn-sm btn-danger cancel-reservation" data-appointment-id="{{ reservation.appointment_id }}" data-reservation-id="{{ reservation.id }}">
+                                        <i class="fas fa-times me-1"></i>Cancel
+                                    </button>
+                                    <button class="btn btn-sm btn-info view-patient" data-patient-id="{{ reservation.patient_id }}">
+                                        <i class="fas fa-user me-1"></i>Patient
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Patients Tab -->
+    <div class="tab-pane fade" id="patients" role="tabpanel" aria-labelledby="patients-tab">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h3 class="h5 mb-0">Patients</h3>
+                <div class="d-flex">
+                    <input type="text" class="form-control form-control-sm" id="patient-search" placeholder="Search by name or email">
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="patients-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Date of Birth</th>
+                                <th>Appointments</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for patient in patients %}
+                            <tr data-patient-id="{{ patient.id }}" class="patient-row">
+                                <td>{{ patient.full_name }}</td>
+                                <td>{{ patient.email }}</td>
+                                <td>{{ patient.date_of_birth.strftime('%Y-%m-%d') }}</td>
+                                <td>{{ patient.reservations|length }}</td>
+                                <td class="patient-actions">
+                                    <button class="btn btn-sm btn-info view-patient-appointments" data-patient-id="{{ patient.id }}">
+                                        <i class="fas fa-calendar me-1"></i>Appointments
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Doctors Tab -->
+    <div class="tab-pane fade" id="doctors" role="tabpanel" aria-labelledby="doctors-tab">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h3 class="h5 mb-0">Doctors</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="doctors-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Specialty</th>
+                                <th>Working Days</th>
+                                <th>Total Appointments</th>
+                                <th>Booked Appointments</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for doctor in doctors %}
+                            <tr data-doctor-id="{{ doctor.id }}" class="doctor-row">
+                                <td>{{ doctor.full_name }}</td>
+                                <td>{{ doctor.specialty }}</td>
+                                <td>
+                                    {% set working_days = {
+                                        1: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                                        2: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                                        3: ["Monday", "Wednesday", "Friday"],
+                                        4: ["Tuesday", "Thursday"],
+                                        5: ["Monday", "Wednesday", "Friday"],
+                                        6: ["Tuesday", "Thursday"],
+                                        7: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+                                    } %}
+                                    {% for day in working_days.get(doctor.id, []) %}
+                                    <span class="badge bg-info">{{ day }}</span>
+                                    {% endfor %}
+                                </td>
+                                <td>{{ doctor_stats[doctor.id]['total'] }}</td>
+                                <td>{{ doctor_stats[doctor.id]['booked'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Appointment Confirmation Modal -->
+<div class="modal fade" id="deleteAppointmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Delete Appointment</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this appointment?</p>
+                <div class="alert alert-warning">
+                    This action cannot be undone.
+                </div>
+                <div id="delete-appointment-details" class="mt-3"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-appointment">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Reservation Confirmation Modal -->
+<div class="modal fade" id="cancelReservationModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Cancel Reservation</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this reservation?</p>
+                <div class="alert alert-warning">
+                    The appointment will be made available for booking again.
+                </div>
+                <div id="cancel-reservation-details" class="mt-3"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-cancel-reservation">Cancel Reservation</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Patient Details Modal -->
+<div class="modal fade" id="patientDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Patient Details</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="patient-details-content"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Patient Appointments Modal -->
+<div class="modal fade" id="patientAppointmentsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Patient Appointments</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="patient-appointments-content"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Appointments filtering
+        $('#appointment-filter-doctor, #appointment-filter-status, #appointment-filter-date').on('change', function() {
+            filterAppointments();
+        });
+        
+        function filterAppointments() {
+            const doctorId = $('#appointment-filter-doctor').val();
+            const status = $('#appointment-filter-status').val();
+            const date = $('#appointment-filter-date').val();
+            
+            $('.appointment-row').each(function() {
+                let show = true;
+                
+                if (doctorId && $(this).data('doctor-id') != doctorId) {
+                    show = false;
+                }
+                
+                if (status && $(this).data('status') != status) {
+                    show = false;
+                }
+                
+                if (date && $(this).data('date') != date) {
+                    show = false;
+                }
+                
+                $(this).toggle(show);
+            });
+        }
+        
+        // Reservations filtering
+        $('#reservation-filter-doctor, #reservation-filter-date').on('change', function() {
+            filterReservations();
+        });
+        
+        function filterReservations() {
+            const doctorId = $('#reservation-filter-doctor').val();
+            const date = $('#reservation-filter-date').val();
+            
+            $('.reservation-row').each(function() {
+                let show = true;
+                
+                if (doctorId && $(this).data('doctor-id') != doctorId) {
+                    show = false;
+                }
+                
+                if (date && $(this).data('date') != date) {
+                    show = false;
+                }
+                
+                $(this).toggle(show);
+            });
+        }
+        
+        // Patient search
+        $('#patient-search').on('keyup', function() {
+            const searchText = $(this).val().toLowerCase();
+            
+            $('.patient-row').each(function() {
+                const name = $(this).find('td:first').text().toLowerCase();
+                const email = $(this).find('td:nth-child(2)').text().toLowerCase();
+                
+                if (name.includes(searchText) || email.includes(searchText)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+        
+        // Delete appointment
+        $('.delete-appointment').click(function() {
+            const appointmentId = $(this).data('appointment-id');
+            const row = $(this).closest('tr');
+            const date = row.find('td:first').text();
+            const time = row.find('td:nth-child(2)').text();
+            const doctor = row.find('td:nth-child(3)').text();
+            
+            $('#delete-appointment-details').html(`
+                <p><strong>Date:</strong> ${date}</p>
+                <p><strong>Time:</strong> ${time}</p>
+                <p><strong>Doctor:</strong> ${doctor}</p>
+            `);
+            
+            $('#confirm-delete-appointment').data('appointment-id', appointmentId);
+            $('#deleteAppointmentModal').modal('show');
+        });
+        
+        $('#confirm-delete-appointment').click(function() {
+            const appointmentId = $(this).data('appointment-id');
+            
+            $.ajax({
+                url: '{{ url_for("admin_delete_appointment") }}',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    appointment_id: appointmentId
+                }),
+                success: function(response) {
+                    if (response.success) {
+                        // Remove the appointment row from the table
+                        $(`tr[data-appointment-id="${appointmentId}"]`).remove();
+                        $('#deleteAppointmentModal').modal('hide');
+                        
+                        // Show success alert
+                        alert('Appointment deleted successfully');
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while deleting the appointment');
+                }
+            });
+        });
+        
+        // Cancel reservation
+        $('.cancel-reservation').click(function() {
+            const appointmentId = $(this).data('appointment-id');
+            const reservationId = $(this).data('reservation-id');
+            const row = $(this).closest('tr');
+            const date = row.find('td:first').text();
+            const time = row.find('td:nth-child(2)').text();
+            const doctor = row.find('td:nth-child(3)').text();
+            const patient = row.find('td:nth-child(4)').text() || 'N/A';
+            
+            $('#cancel-reservation-details').html(`
+                <p><strong>Date:</strong> ${date}</p>
+                <p><strong>Time:</strong> ${time}</p>
+                <p><strong>Doctor:</strong> ${doctor}</p>
+                <p><strong>Patient:</strong> ${patient}</p>
+            `);
+            
+            $('#confirm-cancel-reservation').data('appointment-id', appointmentId);
+            $('#confirm-cancel-reservation').data('reservation-id', reservationId);
+            $('#cancelReservationModal').modal('show');
+        });
+        
+        $('#confirm-cancel-reservation').click(function() {
+            const appointmentId = $(this).data('appointment-id');
+            const reservationId = $(this).data('reservation-id');
+            
+            $.ajax({
+                url: '{{ url_for("admin_cancel_reservation") }}',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    appointment_id: appointmentId,
+                    reservation_id: reservationId
+                }),
+                success: function(response) {
+                    if (response.success) {
+                        // Update both tabs
+                        location.reload();
+                    } else {
+                        alert('Error: ' + response.message);
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while canceling the reservation');
+                }
+            });
+        });
+        
+        // View patient details
+        $('.view-patient').click(function() {
+            const patientId = $(this).data('patient-id');
+            
+            $.ajax({
+                url: `{{ url_for("admin_get_patient") }}?patient_id=${patientId}`,
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        const patient = response.patient;
+                        
+                        $('#patient-details-content').html(`
+                            <div class="mb-3">
+                                <h5>${patient.first_name} ${patient.last_name}</h5>
+                                <p class="text-muted mb-0">Patient ID: ${patient.id}</p>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Email:</strong></div>
+                                <div class="col-8">${patient.email}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Date of Birth:</strong></div>
+                                <div class="col-8">${patient.date_of_birth}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-4"><strong>Appointments:</strong></div>
+                                <div class="col-8">${patient.appointment_count}</div>
+                            </div>
+                        `);
+                        
+                        $('#patientDetailsModal').modal('show');
+                    } else {
+                        alert('Error loading patient details');
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while loading patient details');
+                }
+            });
+        });
+        
+        // View patient appointments
+        $('.view-patient-appointments').click(function() {
+            const patientId = $(this).data('patient-id');
+            
+            $.ajax({
+                url: `{{ url_for("admin_get_patient_appointments") }}?patient_id=${patientId}`,
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        const patient = response.patient;
+                        const appointments = response.appointments;
+                        
+                        let appointmentsHtml = '';
+                        
+                        if (appointments.length > 0) {
+                            appointmentsHtml = `
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Time</th>
+                                                <th>Doctor</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                            `;
+                            
+                            appointments.forEach(appointment => {
+                                appointmentsHtml += `
+                                    <tr>
+                                        <td>${appointment.date}</td>
+                                        <td>${appointment.time}</td>
+                                        <td>${appointment.doctor}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-danger cancel-patient-reservation" 
+                                                    data-appointment-id="${appointment.appointment_id}" 
+                                                    data-reservation-id="${appointment.reservation_id}">
+                                                <i class="fas fa-times me-1"></i>Cancel
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+                            
+                            appointmentsHtml += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            `;
+                        } else {
+                            appointmentsHtml = '<p class="text-muted">No appointments found for this patient.</p>';
+                        }
+                        
+                        $('#patient-appointments-content').html(`
+                            <div class="mb-3">
+                                <h5>${patient.first_name} ${patient.last_name}'s Appointments</h5>
+                                <p class="text-muted mb-3">Patient ID: ${patient.id}</p>
+                            </div>
+                            ${appointmentsHtml}
+                        `);
+                        
+                        // Add event handlers for canceling reservations from this modal
+                        $('.cancel-patient-reservation').click(function() {
+                            const appointmentId = $(this).data('appointment-id');
+                            const reservationId = $(this).data('reservation-id');
+                            
+                            // Close the current modal and open the cancel reservation modal
+                            $('#patientAppointmentsModal').modal('hide');
+                            
+                            // Simulate a click on the corresponding cancel button in the main table
+                            $(`.cancel-reservation[data-reservation-id="${reservationId}"]`).click();
+                        });
+                        
+                        $('#patientAppointmentsModal').modal('show');
+                    } else {
+                        alert('Error loading patient appointments');
+                    }
+                },
+                error: function() {
+                    alert('An error occurred while loading patient appointments');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

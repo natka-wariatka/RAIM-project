@@ -20,6 +20,35 @@
         </div>
     </div>
 </div>
+    <div class="mt-4">
+  <label for="specialist-select">Wybierz specjalistę:</label>
+  <select id="specialist-select" class="form-control">
+    {% for specialist in specialists %}
+      <option value="{{ specialist }}">{{ specialist }}</option>
+    {% endfor %}
+  </select>
+  <button id="check-appointments" class="btn btn-primary mt-2">Sprawdź wizyty</button>
+</div>
+
+<script>
+  document.getElementById("check-appointments").addEventListener("click", () => {
+    const selectedSpecialist = document.getElementById("specialist-select").value;
+    fetch("/forward-to-appointments", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({specialty: selectedSpecialist})
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.redirect_url) {
+        window.location.href = data.redirect_url;
+      } else {
+        alert("Coś poszło nie tak");
+      }
+    });
+  });
+</script>
+
 {% endblock %}
 
 {% block scripts %}

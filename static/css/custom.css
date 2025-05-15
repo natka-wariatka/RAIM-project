@@ -1,4 +1,15 @@
-/* Custom styles for Medical Data Form */
+/* ================================
+   GLOBAL & GENERAL STYLES
+   ================================ */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ================================
+   FORMULARZ DANYCH MEDYCZNYCH
+   ================================ */
 
 /* Form styling */
 .form-group {
@@ -81,7 +92,95 @@ input.form-control-plaintext {
     margin-bottom: 1rem;
 }
 
-/* Responsive adjustments */
+/* ================================
+   SYSTEM REZERWACJI WIZYT
+   ================================ */
+
+/* Appointment table styling */
+.appointment-table th,
+.appointment-table td {
+    vertical-align: middle;
+}
+
+/* Make sure the calendar dates are nicely formatted */
+.appointment-date {
+    font-weight: bold;
+    background-color: var(--bs-gray-800);
+    border-radius: 4px;
+    padding: 8px;
+    margin-bottom: 12px;
+}
+
+/* Appointment card styling */
+.appointment-card {
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.appointment-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Calendar styling */
+.calendar-container {
+    margin-bottom: 2rem;
+}
+
+.calendar-header {
+    font-weight: bold;
+    padding: 0.5rem;
+    background-color: var(--bs-gray-800);
+    border-radius: 4px;
+}
+
+.calendar-day-btn {
+    position: relative;
+    height: 48px;
+    font-weight: bold;
+}
+
+.calendar-day-btn .badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 0.7rem;
+}
+
+.calendar-day-btn.has-appointments {
+    background-color: var(--bs-success);
+    color: white;
+}
+
+.calendar-grid {
+    margin-top: 1rem;
+}
+
+/* ================================
+   ANIMACJE I STANY
+   ================================ */
+
+/* Success and error icon animation */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.text-success,
+.text-danger {
+    animation: pulse 1.5s infinite;
+}
+
+/* ================================
+   RESPONSYWNOŚĆ
+   ================================ */
+
 @media (max-width: 768px) {
     .card-body {
         padding: 1rem;
@@ -96,7 +195,9 @@ input.form-control-plaintext {
     }
 }
 
-/* Print styles */
+/* ================================
+   STYL WYDRUKU
+   ================================ */
 @media print {
     body {
         background-color: white;
