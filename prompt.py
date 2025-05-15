@@ -24,7 +24,7 @@ def medical_interview_response(user_input, history):
         - Location
         - Accompanying symptoms
         - Relevant lifestyle or medical history
-        Keep your questions medium length, don't use too long sentences. 
+        Keep your questions medium length, don't use too long sentences. Maximum of 3 follow-up questions.
         """
     return medical_interview
 
