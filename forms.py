@@ -1,8 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, DateField, FormField, FieldList, TextAreaField, SelectMultipleField, \
-    FloatField, EmailField
-from wtforms.validators import DataRequired, Regexp, ValidationError, Optional, NumberRange, Email
-from wtforms.widgets import CheckboxInput
+from wtforms import StringField, SelectField, FieldList, FormField, FloatField, EmailField, SelectMultipleField
+from wtforms.validators import DataRequired, Regexp, ValidationError, Optional, Email
 from datetime import datetime
 
 
@@ -63,7 +61,6 @@ class MedicalDataForm(FlaskForm):
                        validators=[DataRequired(message="Email is required"),
                                    Email(message="Invalid email address")
                          ])
-
 
     # Blood Test Results
     blood_tests = FieldList(FormField(BloodTestForm), min_entries=1)
@@ -131,20 +128,11 @@ class MedicalDataForm(FlaskForm):
                                                      ('sweating', 'Sweating (excessive/night sweats)')
                                                  ])
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.email = None
-
     def validate_date_of_birth(self, field):
         """Validate date of birth is not in the future"""
         try:
-            # Parse the date string into components
-            day, month, year = field.data.split('.')
-            # Create a datetime object
-            date_obj = datetime(int(year), int(month), int(day)).date()
-            # Check if it's in the future
-            if date_obj > datetime.now().date():
+            date = datetime.strptime(field.data, '%d.%m.%Y').date()
+            if date > datetime.now().date():
                 raise ValidationError('Date of birth cannot be in the future')
         except ValueError:
-            # This will catch invalid dates like 31.02.2020
-            raise ValidationError('Please enter a valid date')
+            raise ValidationError('Invalid date format, please use DD.MM.YYYY')
