@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv('open_ai.env')
+
 import os
 import logging
 import json
@@ -721,4 +724,4 @@ with app.app_context():
     print("Database tables created.")
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='127.0.0.1', port=5001, debug=True)
