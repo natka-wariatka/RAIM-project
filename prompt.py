@@ -47,7 +47,7 @@ def diagnosis(history, specialist_list):
         Here is the history of users answers:
         {history}
 
-        Generate 3 to 4 most likely causes for the user's condition. Include:
+        Generate 3 most likely causes for the user's condition. Include:
         - A short name for the condition
         - Estimated likelihood as a percentage (add up to ~100%)
         - Short explanation (1–2 sentences)
@@ -59,6 +59,12 @@ def diagnosis(history, specialist_list):
         Respond in this format:
 
         1. Condition Name (XX%) - Explanation.
+           Suggested Specialist: [Type of Specialist]
+           
+        2. Condition Name (XX%) - Explanation.
+           Suggested Specialist: [Type of Specialist]
+        
+        3. Condition Name (XX%) - Explanation.
            Suggested Specialist: [Type of Specialist]
         """
     return diagnosis_response

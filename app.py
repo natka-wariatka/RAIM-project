@@ -17,6 +17,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from forms import MedicalDataForm
 import prompt
+import re
 from data import db
 from functools import wraps
 
@@ -51,9 +52,20 @@ with app.app_context():
 
 # Specialist list
 specialists_list = [
-    "General Practitioner", "Neurologist", "Dermatologist", "Cardiologist",
-    "ENT Specialist", "Psychiatrist", "Endocrinologist", "Pulmonologist",
-    "Rheumatologist", "Gastroenterologist"
+    "General Practitioner",
+    "Neurologist",
+    "Dermatologist",
+    "Cardiologist",
+    "ENT Specialist",
+    "Psychiatrist",
+    "Endocrinologist",
+    "Pulmonologist",
+    "Rheumatologist",
+    "Gastroenterologist",
+    "Diabetologist",
+    "Ophthalmologist",
+    "Oncologist",
+    "Urologist"
 ]
 
 # OpenAI init
@@ -200,7 +212,21 @@ def handle_disconnect():
 def handle_user_message(data):
     user_input = data['text']
     response = chatbot_process(user_input)
-    emit('bot_response', {'response': response})
+    emit('bot_response', {'type': 'text', 'response': response})
+
+def parse_diagnosis_response(response):
+    diagnosis_blocks = re.findall(
+        r'\d+\.\s(.+?)\s\((\d+%)\)\s-\s(.*?)\s*Suggested Specialist:\s*(.+?)(?=\n\d+\.|\Z)', response, re.DOTALL)
+
+    parsed = []
+    for name, probability, explanation, specialist in diagnosis_blocks:
+        parsed.append({
+            'condition_name': name.strip(),
+            'probability': probability.strip(),
+            'explanation': explanation.strip(),
+            'specialist': specialist.strip()
+        })
+    return parsed
 
 @socketio.on('diagnose_request')
 def handle_diagnose():
@@ -209,8 +235,9 @@ def handle_diagnose():
         emit('bot_response', {'response': "I am afraid I need more info for proper diagnosis"})
         return
     if 'true' in chatbot_pipeline.invoke(prompt.diagnosis_possible_response(history)).lower():
-        result = chatbot_pipeline.invoke(prompt.diagnosis(history, specialists_list))
-        emit('bot_response', {'response': result})
+        raw_result = chatbot_pipeline.invoke(prompt.diagnosis(history, specialists_list))
+        parsed_result = parse_diagnosis_response(raw_result)
+        emit('bot_response', {'type': 'diagnosis', 'raw_text': raw_result, 'conditions': parsed_result})
     else:
         emit('bot_response', {'response': "I am afraid I need more info for proper diagnosis"})
 
@@ -543,7 +570,7 @@ def admin_get_patient_appointments():
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
 
 if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    socketio.run(app, host='127.0.0.1', port=5001, debug=True)
 
 #TODO usunięcie sesji po zakończeniu rozmowy z czatem/utworzeniu rezerwacji
 #TODO dodanie przycisku powrót do formularza w sekcji chatbota

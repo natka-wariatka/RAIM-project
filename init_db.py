@@ -34,17 +34,35 @@ def init_database():
         db.drop_all()
         db.create_all()
         print("Database tables dropped and recreated.")
-        
-        # Add doctors
-        add_doctor("Kaja", "Kowalska", "Cardiologist")
-        add_doctor("Krzysztof", "Kruk", "Cardiologist")
-        add_doctor("Ofelia", "Onys", "Orthopedist")
-        add_doctor("Olinek", "Okrąglinek", "Orthopedist")
-        add_doctor("Elwira", "Emu", "Endocrinologist")
-        add_doctor("Piotr", "Ptak", "Psychiatrist")
-        add_doctor("Norbert", "Norwid", "Neurologist")
+
+        add_doctor("Ewelina", "Borowska", "General Practitioner")
+        add_doctor("Robert", "Wrona", "General Practitioner")
+        add_doctor("Justyna", "Nowicka", "Neurologist")
+        add_doctor("Wiktor", "Kula", "Neurologist")
+        add_doctor("Karolina", "Malec", "Dermatologist")
+        add_doctor("Paweł", "Sarna", "Dermatologist")
+        add_doctor("Marcin", "Nosal", "ENT Specialist")
+        add_doctor("Iwona", "Uszna", "ENT Specialist")
+        add_doctor("Alicja", "Stelmach", "Psychiatrist")
+        add_doctor("Damian", "Nowosad", "Psychiatrist")
+        add_doctor("Grażyna", "Hormoniak", "Endocrinologist")
+        add_doctor("Mariusz", "Taras", "Endocrinologist")
+        add_doctor("Sebastian", "Tchórz", "Pulmonologist")
+        add_doctor("Julia", "Oddych", "Pulmonologist")
+        add_doctor("Marta", "Kość", "Rheumatologist")
+        add_doctor("Arkadiusz", "Zgięt", "Rheumatologist")
+        add_doctor("Renata", "Żołądek", "Gastroenterologist")
+        add_doctor("Tadeusz", "Jelitko", "Gastroenterologist")
+        add_doctor("Patryk", "Cukier", "Diabetologist")
+        add_doctor("Joanna", "Glukoza", "Diabetologist")
+        add_doctor("Barbara", "Soczewka", "Ophthalmologist")
+        add_doctor("Adam", "Wzrok", "Ophthalmologist")
+        add_doctor("Edyta", "Rakowska", "Oncologist")
+        add_doctor("Kamil", "Chemiak", "Oncologist")
+        add_doctor("Olga", "Strumień", "Urologist")
+        add_doctor("Jakub", "Mocznik", "Urologist")
         print("Doctors added to the database.")
-        
+
         # Get all doctors
         doctors = db.session.query(Doctor).all()
         
@@ -67,22 +85,68 @@ def init_database():
         
         # Define doctor schedules (days of week they work, where 0=Monday, 1=Tuesday, etc.)
         doctor_schedules = {
-            # Cardiologists work all weekdays
-            1: [0, 1, 2, 3, 4],  # Dr. Kaja Kowalska
-            2: [0, 1, 2, 3, 4],  # Dr. Krzysztof Kruk
-            
-            # Orthopedists alternate days
-            3: [0, 2, 4],  # Dr. Ofelia Onys works Monday, Wednesday, Friday
-            4: [1, 3],     # Dr. Olinek Okrąglinek works Tuesday, Thursday
-            
-            # Endocrinologist works 3 days
-            5: [0, 2, 4],  # Dr. Elwira Emu works Monday, Wednesday, Friday
-            
-            # Psychiatrist works 2 days
-            6: [1, 3],     # Dr. Piotr Ptak works Tuesday, Thursday
-            
-            # Neurologist works all weekdays
-            7: [0, 1, 2, 3, 4]  # Dr. Norbert Norwid
+            # Cardiologists
+            1: [0, 1, 2, 3, 4],  # Kaja Kowalska
+            2: [0, 1, 2, 3, 4],  # Krzysztof Kruk
+
+            # Orthopedists
+            3: [0, 2, 4],  # Ofelia Onys
+            4: [1, 3],  # Olinek Okrąglinek
+
+            # Endocrinologists
+            5: [0, 2, 4],  # Elwira Emu
+            17: [1, 3],  # Grażyna Hormoniak
+            18: [2, 4],  # Mariusz Taras
+
+            # Psychiatrists
+            6: [1, 3],  # Piotr Ptak
+            19: [2, 4],  # Alicja Stelmach
+            20: [0, 2],  # Damian Nowosad
+
+            # Neurologists
+            7: [0, 1, 2, 3, 4],  # Norbert Norwid
+            21: [2, 3, 4],  # Justyna Nowicka
+            22: [0, 1, 3],  # Wiktor Kula
+
+            # General Practitioners
+            23: [0, 1, 2, 3, 4],  # Ewelina Borowska
+            24: [0, 1, 2, 3, 4],  # Robert Wrona
+
+            # Dermatologists
+            25: [1, 3],  # Karolina Malec
+            26: [2, 4],  # Paweł Sarna
+
+            # ENT Specialists
+            27: [1, 3],  # Marcin Nosal
+            28: [0, 2],  # Iwona Uszna
+
+            # Pulmonologists
+            29: [0, 1, 2],  # Sebastian Tchórz
+            30: [2, 3, 4],  # Julia Oddych
+
+            # Rheumatologists
+            31: [1, 4],  # Marta Kość
+            32: [2, 3],  # Arkadiusz Zgięt
+
+            # Gastroenterologists
+            33: [0, 3, 4],  # Renata Żołądek
+            34: [1, 2],  # Tadeusz Jelitko
+
+            # Diabetologists
+            35: [2, 4],  # Patryk Cukier
+            36: [1, 3],  # Joanna Glukoza
+
+            # Ophthalmologists
+            37: [0, 3],  # Barbara Soczewka
+            38: [2, 4],  # Adam Wzrok
+
+            # Oncologists
+            39: [1, 4],  # Edyta Rakowska
+            40: [0, 2],  # Kamil Chemiak
+
+            # Urologists
+            41: [0, 3],  # Olga Strumień
+            42: [1, 4]  # Jakub Mocznik
         }
         
         appointment_count = 0

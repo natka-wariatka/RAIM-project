@@ -21,8 +21,7 @@ class BloodTestForm(FlaskForm):
             field.data = 0.0
 
     class Meta:
-        # Disable CSRF for nested form (flask doesn't properly handle multiple tokens in nested forms,
-        # and without this exclusion, the form didn't pass validation even though the data was correct)
+        # Disable CSRF for nested form
         csrf = False
 
 
