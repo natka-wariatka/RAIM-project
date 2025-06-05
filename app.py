@@ -232,14 +232,14 @@ def parse_diagnosis_response(response):
 def handle_diagnose():
     history = session.get('history', [])
     if not history:
-        emit('bot_response', {'response': "I am afraid I need more info for proper diagnosis"})
+        emit('bot_response', {'type': 'not_diagnosis', 'response': "I am afraid I need more info for proper diagnosis"})
         return
     if 'true' in chatbot_pipeline.invoke(prompt.diagnosis_possible_response(history)).lower():
         raw_result = chatbot_pipeline.invoke(prompt.diagnosis(history, specialists_list))
         parsed_result = parse_diagnosis_response(raw_result)
         emit('bot_response', {'type': 'diagnosis', 'raw_text': raw_result, 'conditions': parsed_result})
     else:
-        emit('bot_response', {'response': "I am afraid I need more info for proper diagnosis"})
+        emit('bot_response', {'type': 'not_diagnosis', 'response': "I am afraid I need more info for proper diagnosis"})
 
 @app.route('/bookings')
 def bookings_view():
@@ -572,10 +572,5 @@ def admin_get_patient_appointments():
 if __name__ == '__main__':
     socketio.run(app, host='127.0.0.1', port=5001, debug=True)
 
-#TODO usunięcie sesji po zakończeniu rozmowy z czatem/utworzeniu rezerwacji
 #TODO dodanie przycisku powrót do formularza w sekcji chatbota
 #TODO dodanie fixed messege po uzupełnieniu formularza
-#TODO naprawić podawanie daty w systemie rezerwacji
-#TODO dodać email do wypełniania formularza
-#TODO poprawić dopasowywanie się areatext przypisaniu z czatem
-#TODO przekazywanie danych formularza od razu do widoku /book_appointments

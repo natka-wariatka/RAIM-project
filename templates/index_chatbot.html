@@ -8,15 +8,16 @@
     <div class="card-body" style="height: 500px; overflow-y: auto;" id="chatbox">
     </div>
     <div class="card-footer bg-dark">
-        <div class="input-group">
-            <textarea id="userInput" class="form-control" placeholder="Tell me about your symptoms ☺️" rows="1" style="resize: none; overflow-y: hidden;"></textarea>
-            <button class="btn btn-success" id="sendBtn">
+        <div class="input-group flex-nowrap align-items-end">
+            <textarea id="userInput" class="form-control" placeholder="Tell me about your symptoms ☺️"
+                rows="1" style="resize: none; max-height: 7.5em; overflow-y: auto;"></textarea>
+            <button class="btn btn-success ms-2" id="sendBtn">
                 <i class="fa-solid fa-paper-plane"></i>
             </button>
-            <button class="btn btn-warning" id="diagnoseBtn">
+            <button class="btn btn-warning ms-2" id="diagnoseBtn">
                 <i class="fa-solid fa-stethoscope"></i> Diagnose
             </button>
-            <a href="{{ url_for('bookings_view') }}" class="btn btn-primary">
+            <a href="{{ url_for('bookings_view') }}" class="btn btn-primary ms-2">
                 <i class="fas fa-calendar-check me-2"></i> Book Appointment
             </a>
         </div>
@@ -34,7 +35,7 @@
       </div>
       <div class="modal-body">
         <div id="specialistCards" class="row g-3 mb-4">
-          <!-- Specialist cards will be injected here by JS -->
+          <!-- Specialist cards -->
         </div>
 
         <hr>

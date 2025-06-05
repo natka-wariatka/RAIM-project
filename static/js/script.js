@@ -5,12 +5,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const diagnoseBtn = document.getElementById("diagnoseBtn");
     const chatbox = document.getElementById("chatbox");
 
-    // Funkcja dodawania wiadomości do czatu
     function addMessage(role, text) {
         const message = document.createElement("div");
         message.classList.add("mb-3");
-
-        // Dostosowanie klasy do roli i wyglądu wiadomości
         message.classList.add(role === 'user' ? 'text-end' : 'text-start');
         message.innerHTML = `
             <div class="d-inline-block p-2 rounded-3 ${role === 'user' ? 'bg-success text-light' : 'bg-light text-dark'}">
@@ -21,7 +18,6 @@ document.addEventListener("DOMContentLoaded", () => {
         chatbox.scrollTop = chatbox.scrollHeight;
     }
 
-    // Obsługa przycisku wysyłania wiadomości
     sendBtn.addEventListener("click", () => {
         const text = userInput.value.trim();
         if (!text) return;
@@ -31,25 +27,27 @@ document.addEventListener("DOMContentLoaded", () => {
         userInput.value = "";
     });
 
-    // Obsługa przycisku diagnozy
     diagnoseBtn.addEventListener("click", () => {
         socket.emit("diagnose_request");
     });
 
     textarea.addEventListener("input", () => {
-        textarea.style.height = 'auto';  // Reset height
+        textarea.style.height = 'auto';
         textarea.style.height = textarea.scrollHeight + 'px';
     });
 
     textarea.addEventListener("keydown", function(e) {
         if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();  // Prevent newline
+            e.preventDefault();
             document.getElementById("sendBtn").click();
         }
     });
 
     socket.on("bot_response", function(data) {
     if (data.type === 'text') {
+        addMessage("assistant", data.response);
+    };
+    if (data.type === 'not_diagnosis') {
         addMessage("assistant", data.response);
     } else if (data.type === 'diagnosis') {
         addMessage("assistant", "Based on your answers, here are some possible conditions:");
@@ -71,10 +69,9 @@ document.addEventListener("DOMContentLoaded", () => {
         card.innerHTML = `
             <div class="card border-primary shadow-sm h-100 specialist-card" data-specialist="${cond.specialist}">
                 <div class="card-body">
-                    <h5 class="card-title">${cond.condition_name}</h5>
+                    <h5 class="card-title"><strong>Suggested Specialist:</strong> ${cond.specialist}</h5>
+                    <p class="card-text"><strong>Condition:</strong> ${cond.condition_name}</p>
                     <p class="card-text"><strong>Probability:</strong> ${cond.probability}</p>
-                    <p class="card-text"><strong>Explanation:</strong> ${cond.explanation}</p>
-                    <p class="card-text"><strong>Suggested Specialist:</strong> ${cond.specialist}</p>
                 </div>
             </div>
         `;
