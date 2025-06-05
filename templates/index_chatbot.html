@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="mb-4">
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Registration
+    </a>
+</div>
+
 <div class="card shadow-lg rounded-4">
     <div class="card-header bg-primary text-white">
         <i class="fa-solid fa-robot me-2"></i> Chatbot Assistant

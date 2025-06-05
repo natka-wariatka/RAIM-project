@@ -593,11 +593,8 @@ def admin_get_patient_appointments():
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
 
 
-# Admin routes
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, host='127.0.0.1', port=5001, debug=True, allow_unsafe_werkzeug=True)
 
-#TODO dodanie przycisku powrót do formularza w sekcji chatbota
-#TODO dodanie fixed messege po uzupełnieniu formularza
