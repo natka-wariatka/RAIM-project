@@ -59,7 +59,7 @@ class MedicalDataForm(FlaskForm):
                                 ])
 
     # Blood Test Results
-    blood_tests = FieldList(FormField(BloodTestForm), min_entries=1)
+    blood_tests = FieldList(FormField(BloodTestForm), min_entries=0) # mogą zostać puste
 
     # Symptom Duration
     symptom_duration = SelectField('Length of Symptoms',

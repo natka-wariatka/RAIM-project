@@ -1,6 +1,5 @@
 cachelib
 certifi
-eventlet
 Flask
 Flask-Session
 Flask-SocketIO

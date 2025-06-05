@@ -71,3 +71,5 @@ class Reservation(db.Model):
     
     def __repr__(self):
         return f"Reservation for {self.patient} at {self.appointment}"
+
+
