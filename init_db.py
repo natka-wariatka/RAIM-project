@@ -1,5 +1,5 @@
 import os
-import datetime
+from _datetime import datetime
 from dateutil.relativedelta import relativedelta, MO
 from app import app, db
 from models import Doctor, Appointment
@@ -36,39 +36,38 @@ def init_database():
         print("Database tables dropped and recreated.")
 
         doctors_to_add = [
-            ("Kaja", "Kowalska", "Cardiologist"),
-            ("Krzysztof", "Kruk", "Cardiologist"),
-            ("Ofelia", "Onys", "Orthopedist"),
+            ("Patrycja", "Puls", "Cardiologist"),
+            ("Stefan", "Sercowicz", "Cardiologist"),
+            ("Ofelia", "Okostna", "Orthopedist"),
             ("Olinek", "Okrąglinek", "Orthopedist"),
             ("Elwira", "Emu", "Endocrinologist"),
-            ("Piotr", "Ptak", "Psychiatrist"),
-            ("Norbert", "Norwid", "Neurologist"),
-            ("Ewelina", "Borowska", "General Practitioner"),
-            ("Robert", "Wrona", "General Practitioner"),
-            ("Justyna", "Nowicka", "Neurologist"),
-            ("Wiktor", "Kula", "Neurologist"),
-            ("Karolina", "Malec", "Dermatologist"),
-            ("Paweł", "Sarna", "Dermatologist"),
-            ("Marcin", "Nosal", "ENT Specialist"),
-            ("Iwona", "Uszna", "ENT Specialist"),
-            ("Alicja", "Stelmach", "Psychiatrist"),
-            ("Damian", "Nowosad", "Psychiatrist"),
-            ("Grażyna", "Hormoniak", "Endocrinologist"),
-            ("Mariusz", "Taras", "Endocrinologist"),
-            ("Sebastian", "Tchórz", "Pulmonologist"),
-            ("Julia", "Oddych", "Pulmonologist"),
-            ("Marta", "Kość", "Rheumatologist"),
-            ("Arkadiusz", "Zgięt", "Rheumatologist"),
-            ("Renata", "Żołądek", "Gastroenterologist"),
-            ("Tadeusz", "Jelitko", "Gastroenterologist"),
-            ("Patryk", "Cukier", "Diabetologist"),
-            ("Joanna", "Glukoza", "Diabetologist"),
-            ("Barbara", "Soczewka", "Ophthalmologist"),
-            ("Adam", "Wzrok", "Ophthalmologist"),
-            ("Edyta", "Rakowska", "Oncologist"),
-            ("Kamil", "Chemiak", "Oncologist"),
-            ("Olga", "Strumień", "Urologist"),
-            ("Jakub", "Mocznik", "Urologist"),
+            ("Halina", "Hormoniak", "Endocrinologist"),
+            ("Patryk", "Przysadek", "Endocrinologist"),
+            ("Urszula", "Umyślna", "Psychiatrist"),
+            ("Monika", "Móżdżek", "Psychiatrist"),
+            ("Piotr", "Psych", "Psychiatrist"),
+            ("Norbert", "Neuron", "Neurologist"),
+            ("Sylwia", "Synapsa", "Neurologist"),
+            ("Zuzanna", "Zdrowiak", "General Practitioner"),
+            ("Bartosz", "Badalski", "General Practitioner"),
+            ("Sandra", "Skórna", "Dermatologist"),
+            ("Sylwester", "Skórecki", "Dermatologist"),
+            ("Nikola", "Nosal", "ENT Specialist"),
+            ("Urszula", "Uszna", "ENT Specialist"),
+            ("Teresa", "Tchnienie", "Pulmonologist"),
+            ("Olaf", "Oddych", "Pulmonologist"),
+            ("Karolina", "Kość", "Rheumatologist"),
+            ("Zygmunt", "Zgięt", "Rheumatologist"),
+            ("Kornelia", "Kiszkowska", "Gastroenterologist"),
+            ("Justyna", "Jelitko", "Gastroenterologist"),
+            ("Celina", "Cukierek", "Diabetologist"),
+            ("Gerard", "Glukoza", "Diabetologist"),
+            ("Sylwia", "Soczewka", "Ophthalmologist"),
+            ("Wanda", "Wzrok", "Ophthalmologist"),
+            ("Robert", "Rakowski", "Oncologist"),
+            ("Cezary", "Chemiak", "Oncologist"),
+            ("Sabrina", "Strumień", "Urologist"),
+            ("Mikołaj", "Mocznik", "Urologist"),
         ]
 
         for first, last, spec in doctors_to_add:
@@ -77,45 +76,44 @@ def init_database():
         print("Doctors added to the database.")
 
         doctor_schedules = {
-            ("Kaja", "Kowalska"): [0, 1, 2, 3, 4],
-            ("Krzysztof", "Kruk"): [0, 1, 2, 3, 4],
-            ("Ofelia", "Onys"): [0, 2, 4],
+            ("Patrycja", "Puls"): [0, 1, 2, 3, 4],
+            ("Stefan", "Sercowicz"): [0, 1, 2, 3, 4],
+            ("Ofelia", "Okostna"): [0, 2, 4],
             ("Olinek", "Okrąglinek"): [1, 3],
             ("Elwira", "Emu"): [0, 2, 4],
-            ("Grażyna", "Hormoniak"): [1, 3],
-            ("Mariusz", "Taras"): [2, 4],
-            ("Piotr", "Ptak"): [1, 3],
-            ("Alicja", "Stelmach"): [2, 4],
-            ("Damian", "Nowosad"): [0, 2],
-            ("Norbert", "Norwid"): [0, 1, 2, 3, 4],
-            ("Justyna", "Nowicka"): [2, 3, 4],
-            ("Wiktor", "Kula"): [0, 1, 3],
-            ("Ewelina", "Borowska"): [0, 1, 2, 3, 4],
-            ("Robert", "Wrona"): [0, 1, 2, 3, 4],
-            ("Karolina", "Malec"): [1, 3],
-            ("Paweł", "Sarna"): [2, 4],
-            ("Marcin", "Nosal"): [1, 3],
-            ("Iwona", "Uszna"): [0, 2],
-            ("Sebastian", "Tchórz"): [0, 1, 2],
-            ("Julia", "Oddych"): [2, 3, 4],
-            ("Marta", "Kość"): [1, 4],
-            ("Arkadiusz", "Zgięt"): [2, 3],
-            ("Renata", "Żołądek"): [0, 3, 4],
-            ("Tadeusz", "Jelitko"): [1, 2],
-            ("Patryk", "Cukier"): [2, 4],
-            ("Joanna", "Glukoza"): [1, 3],
-            ("Barbara", "Soczewka"): [0, 3],
-            ("Adam", "Wzrok"): [2, 4],
-            ("Edyta", "Rakowska"): [1, 4],
-            ("Kamil", "Chemiak"): [0, 2],
-            ("Olga", "Strumień"): [0, 3],
-            ("Jakub", "Mocznik"): [1, 4]
+            ("Halina", "Hormoniak"): [1, 3],
+            ("Patryk", "Przysadek"): [2, 4],
+            ("Urszula", "Umyślna"): [0, 2],
+            ("Monika", "Móżdżek"): [1, 3],
+            ("Piotr", "Psych"): [0, 1, 2],
+            ("Norbert", "Neuron"): [0, 1, 2, 3, 4],
+            ("Sylwia", "Synapsa"): [2, 3, 4],
+            ("Zuzanna", "Zdrowiak"): [0, 1, 2, 3, 4],
+            ("Bartosz", "Badalski"): [0, 1, 2, 3, 4],
+            ("Sandra", "Skórna"): [1, 3],
+            ("Sylwester", "Skórecki"): [2, 4],
+            ("Nikola", "Nosal"): [1, 3],
+            ("Urszula", "Uszna"): [0, 2],
+            ("Teresa", "Tchnienie"): [0, 1, 2],
+            ("Olaf", "Oddych"): [2, 3, 4],
+            ("Karolina", "Kość"): [1, 4],
+            ("Zygmunt", "Zgięt"): [2, 3],
+            ("Kornelia", "Kiszkowska"): [0, 3, 4],
+            ("Justyna", "Jelitko"): [1, 2],
+            ("Celina", "Cukierek"): [2, 4],
+            ("Gerard", "Glukoza"): [1, 3],
+            ("Sylwia", "Soczewka"): [0, 3],
+            ("Wanda", "Wzrok"): [2, 4],
+            ("Robert", "Rakowski"): [1, 4],
+            ("Cezary", "Chemiak"): [0, 2],
+            ("Sabrina", "Strumień"): [0, 3],
+            ("Mikołaj", "Mocznik"): [1, 4]
         }
 
         doctors = db.session.query(Doctor).all()
 
-        start_date = datetime.datetime(2025, 6, 1)
-        end_date = datetime.datetime(2025, 6, 30)
+        start_date = datetime(2025, 6, 1)
+        end_date = datetime(2025, 6, 30)
         first_monday = start_date + relativedelta(weekday=MO(0)) if start_date.weekday() != 0 else start_date
 
         start_hour = 8
