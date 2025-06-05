@@ -1,6 +1,3 @@
-import eventlet
-eventlet.monkey_patch()
-
 from dotenv import load_dotenv
 load_dotenv('open_ai.env')
 
@@ -8,7 +5,7 @@ import os
 import json
 import io
 import logging
-import datetime
+from datetime import datetime
 
 from flask import Flask, render_template, redirect, url_for, flash, request, session, send_file, jsonify
 from flask_session import Session
@@ -17,6 +14,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.output_parsers import StrOutputParser
 from forms import MedicalDataForm
 import prompt
+import re
 from data import db
 from functools import wraps
 
@@ -34,7 +32,7 @@ app.config["SESSION_PERMANENT"] = False
 Session(app)
 
 # SocketIO
-socketio = SocketIO(app, cors_allowed_origins="*", manage_session=True)
+socketio = SocketIO(app, cors_allowed_origins="*", manage_session=True, async_mode='threading')
 
 # SQL config
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///hospital.db"
@@ -51,9 +49,20 @@ with app.app_context():
 
 # Specialist list
 specialists_list = [
-    "General Practitioner", "Neurologist", "Dermatologist", "Cardiologist",
-    "ENT Specialist", "Psychiatrist", "Endocrinologist", "Pulmonologist",
-    "Rheumatologist", "Gastroenterologist"
+    "General Practitioner",
+    "Neurologist",
+    "Dermatologist",
+    "Cardiologist",
+    "ENT Specialist",
+    "Psychiatrist",
+    "Endocrinologist",
+    "Pulmonologist",
+    "Rheumatologist",
+    "Gastroenterologist",
+    "Diabetologist",
+    "Ophthalmologist",
+    "Oncologist",
+    "Urologist"
 ]
 
 # OpenAI init
@@ -134,6 +143,15 @@ def index():
             logging.error(f"Error processing form: {str(e)}")
             flash(f"An error occurred: {str(e)}", "danger")
 
+        if form.validate_on_submit():
+            # Zapisz dane do sesji
+            session['first_name'] = form.first_name.data
+            session['last_name'] = form.last_name.data
+            session['date_of_birth'] = form.date_of_birth.data
+
+            # przekieruj do drugiego formularza
+            return redirect(url_for('show_appointments'))
+
     return render_template('form.html', form=form)
 
 @app.route('/results')
@@ -171,7 +189,7 @@ def add_to_history(role, content):
     if 'history' not in session:
         session['history'] = [{
             'role': 'system',
-            'content': f'Today is {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}. Think carefully.'
+            'content': f'Today is {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}. Think carefully.'
         }]
     session['history'].append({'role': role, 'content': content})
     session.modified = True
@@ -200,19 +218,34 @@ def handle_disconnect():
 def handle_user_message(data):
     user_input = data['text']
     response = chatbot_process(user_input)
-    emit('bot_response', {'response': response})
+    emit('bot_response', {'type': 'text', 'response': response})
+
+def parse_diagnosis_response(response):
+    diagnosis_blocks = re.findall(
+        r'\d+\.\s(.+?)\s\((\d+%)\)\s-\s(.*?)\s*Suggested Specialist:\s*(.+?)(?=\n\d+\.|\Z)', response, re.DOTALL)
+
+    parsed = []
+    for name, probability, explanation, specialist in diagnosis_blocks:
+        parsed.append({
+            'condition_name': name.strip(),
+            'probability': probability.strip(),
+            'explanation': explanation.strip(),
+            'specialist': specialist.strip()
+        })
+    return parsed
 
 @socketio.on('diagnose_request')
 def handle_diagnose():
     history = session.get('history', [])
     if not history:
-        emit('bot_response', {'response': "I am afraid I need more info for proper diagnosis"})
+        emit('bot_response', {'type': 'not_diagnosis', 'response': "I am afraid I need more info for proper diagnosis"})
         return
     if 'true' in chatbot_pipeline.invoke(prompt.diagnosis_possible_response(history)).lower():
-        result = chatbot_pipeline.invoke(prompt.diagnosis(history, specialists_list))
-        emit('bot_response', {'response': result})
+        raw_result = chatbot_pipeline.invoke(prompt.diagnosis(history, specialists_list))
+        parsed_result = parse_diagnosis_response(raw_result)
+        emit('bot_response', {'type': 'diagnosis', 'raw_text': raw_result, 'conditions': parsed_result})
     else:
-        emit('bot_response', {'response': "I am afraid I need more info for proper diagnosis"})
+        emit('bot_response', {'type': 'not_diagnosis', 'response': "I am afraid I need more info for proper diagnosis"})
 
 @app.route('/bookings')
 def bookings_view():
@@ -224,17 +257,22 @@ def bookings_view():
 
 @app.route('/appointments', methods=['POST'])
 def show_appointments():
-    # Get form data
+    patient_data = session.get('patient_data', {
+        'first_name': '',
+        'last_name': '',
+        'date_of_birth': '',
+        'email': ''
+    })
+    return render_template('appointments.html', patient_data=patient_data)
+
+    # POST
     first_name = request.form.get('first_name')
     last_name = request.form.get('last_name')
     date_of_birth = request.form.get('date_of_birth')
     email = request.form.get('email')
     specialty = request.form.get('specialty')
 
-    # Store form data in a variable for later use
-    form_data = request.form
-
-    # Validate form data
+    # Walidacja
     if not all([first_name, last_name, date_of_birth, email, specialty]):
         flash('All fields are required', 'danger')
         return redirect(url_for('index'))
@@ -305,7 +343,7 @@ def book_appointment():
         email = data.get('email')
 
         # Convert date_of_birth string to date object
-        dob = datetime.datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+        dob = datetime.strptime(date_of_birth, '%d.%m.%Y').date()
 
         # Check if appointment exists and is not already booked
         appointment = Appointment.query.get(appointment_id)
@@ -342,6 +380,18 @@ def book_appointment():
         db.session.rollback()
         logger.error(f"Error booking appointment: {str(e)}")
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+
+
+# Admin authentication decorator
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'admin_authenticated' not in session or not session['admin_authenticated']:
+            flash('Please log in as administrator', 'danger')
+            return redirect(url_for('admin_login_page'))
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 # Admin authentication decorator
@@ -542,13 +592,12 @@ def admin_get_patient_appointments():
         logger.error(f"Error getting patient appointments: {str(e)}")
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
 
-if __name__ == '__main__':
-    socketio.run(app, host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
 
-#TODO usunięcie sesji po zakończeniu rozmowy z czatem/utworzeniu rezerwacji
+# Admin routes
+
+
+if __name__ == '__main__':
+    socketio.run(app, debug=True)
+
 #TODO dodanie przycisku powrót do formularza w sekcji chatbota
 #TODO dodanie fixed messege po uzupełnieniu formularza
-#TODO naprawić podawanie daty w systemie rezerwacji
-#TODO dodać email do wypełniania formularza
-#TODO poprawić dopasowywanie się areatext przypisaniu z czatem
-#TODO przekazywanie danych formularza od razu do widoku /book_appointments

@@ -12,19 +12,20 @@ def medically_relevant_response(user_input):
 def medical_interview_response(user_input, history):
     medical_interview = f"""
         The user described the following health issue:
-
+        
         {user_input} and here are the previous answers: {history}
-
-        Your task is to act like a friendly medical assistant.
-        Generate medically relevant follow-up questions to gather more information. 
-        Take under the consideration the previous answers. If there is an "intro text" in history session try to focus on medical data provided.
-        The goal is to understand the user's symptoms better in terms of:
-        - Duration and onset
-        - Severity
-        - Location
-        - Accompanying symptoms
-        - Relevant lifestyle or medical history
-        Keep your questions medium length, don't use too long sentences. Maximum of 3 follow-up questions.
+        
+        Your task is to act like a friendly and thorough medical assistant.
+        Generate medically relevant follow-up questions to gather more information.
+        Take into consideration the previous answers. If there is an "intro text" in the history session, focus on the medical data provided.
+        
+        Your goals are:
+        - Clarify existing symptoms (e.g. duration, onset, severity, location, accompanying symptoms, lifestyle/medical history).
+        - Explore common related symptoms that the user has not yet mentioned but may be relevant based on the initial description (e.g. in case of fever and chills, ask also about cough, sore throat, or muscle aches).
+        - Help identify possible patterns and rule out other conditions.
+        
+        Keep your questions medium length. Don't use overly long sentences.
+        Ask up to 3 follow-up questions. Include both clarifying and exploratory questions.
         """
     return medical_interview
 
@@ -47,7 +48,7 @@ def diagnosis(history, specialist_list):
         Here is the history of users answers:
         {history}
 
-        Generate 3 to 4 most likely causes for the user's condition. Include:
+        Generate 3 most likely causes for the user's condition. Include:
         - A short name for the condition
         - Estimated likelihood as a percentage (add up to ~100%)
         - Short explanation (1–2 sentences)
@@ -59,6 +60,12 @@ def diagnosis(history, specialist_list):
         Respond in this format:
 
         1. Condition Name (XX%) - Explanation.
+           Suggested Specialist: [Type of Specialist]
+           
+        2. Condition Name (XX%) - Explanation.
+           Suggested Specialist: [Type of Specialist]
+        
+        3. Condition Name (XX%) - Explanation.
            Suggested Specialist: [Type of Specialist]
         """
     return diagnosis_response

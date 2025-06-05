@@ -21,8 +21,7 @@ class BloodTestForm(FlaskForm):
             field.data = 0.0
 
     class Meta:
-        # Disable CSRF for nested form (flask doesn't properly handle multiple tokens in nested forms,
-        # and without this exclusion, the form didn't pass validation even though the data was correct)
+        # Disable CSRF for nested form
         csrf = False
 
 
@@ -60,7 +59,7 @@ class MedicalDataForm(FlaskForm):
                                 ])
 
     # Blood Test Results
-    blood_tests = FieldList(FormField(BloodTestForm), min_entries=1)
+    blood_tests = FieldList(FormField(BloodTestForm), min_entries=0) # mogą zostać puste
 
     # Symptom Duration
     symptom_duration = SelectField('Length of Symptoms',
