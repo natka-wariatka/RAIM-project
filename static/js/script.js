@@ -72,6 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <h5 class="card-title"><strong>Suggested Specialist:</strong> ${cond.specialist}</h5>
                     <p class="card-text"><strong>Condition:</strong> ${cond.condition_name}</p>
                     <p class="card-text"><strong>Probability:</strong> ${cond.probability}</p>
+                    <p class="card-text"><strong>Explanation:</strong> ${cond.explanation}</p>
                 </div>
             </div>
         `;
