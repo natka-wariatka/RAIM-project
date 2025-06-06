@@ -176,6 +176,7 @@ def chat_view():
 
     return render_template('index_chatbot.html', form_data=form_data)
 
+# Welcome message
 @socketio.on('chatbot')
 def chat_intro():
     form_data = session.get('form_data')
@@ -191,6 +192,7 @@ def chat_intro():
     emit('bot_response', {'type': 'text', 'response': first_response})
 
 
+# Creating message history
 def add_to_history(role, content):
     if 'history' not in session:
         session['history'] = [{
@@ -200,6 +202,7 @@ def add_to_history(role, content):
     session['history'].append({'role': role, 'content': content})
     session.modified = True
 
+# Chatbot process - veryfing messages and replying
 def chatbot_process(user_input):
     relevance_response = chatbot_pipeline.invoke(prompt.medically_relevant_response(user_input))
     if 'true' not in relevance_response.lower():
@@ -226,6 +229,7 @@ def handle_user_message(data):
     response = chatbot_process(user_input)
     emit('bot_response', {'type': 'text', 'response': response})
 
+# Parsing diagnose message for later use in registration system
 def parse_diagnosis_response(response):
     diagnosis_blocks = re.findall(
         r'\d+\.\s(.+?)\s\((\d+%)\)\s-\s(.*?)\s*Suggested Specialist:\s*(.+?)(?=\n\d+\.|\Z)', response, re.DOTALL)
@@ -240,6 +244,7 @@ def parse_diagnosis_response(response):
         })
     return parsed
 
+# Diagnose process
 @socketio.on('diagnose_request')
 def handle_diagnose():
     history = session.get('history', [])
@@ -253,6 +258,7 @@ def handle_diagnose():
     else:
         emit('bot_response', {'type': 'not_diagnosis', 'response': "I am afraid I need more info for proper diagnosis"})
 
+# Passing previous form data for registration system
 @app.route('/bookings')
 def bookings_view():
     session_data = session.get('form_data')

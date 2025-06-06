@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const diagnoseBtn = document.getElementById("diagnoseBtn");
     const chatbox = document.getElementById("chatbox");
 
+    // Dynamic messages
     function addMessage(role, text) {
         const message = document.createElement("div");
         message.classList.add("mb-3");
@@ -44,6 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // Emit proper messages based on type parameter
     socket.on("bot_response", function(data) {
         if (data.type === 'text' || data.type === 'intro') {
             addMessage("assistant", data.response);
@@ -57,37 +59,38 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
- function displayDiagnosisPopup(conditions, rawText) {
-    const cardsContainer = document.getElementById("specialistCards");
-    cardsContainer.innerHTML = "";
+    // Dynamic specialist cards based on output from the chatbot module
+    function displayDiagnosisPopup(conditions, rawText) {
+        const cardsContainer = document.getElementById("specialistCards");
+        cardsContainer.innerHTML = "";
 
-    const selectedSpecialistInput = document.getElementById("selectedSpecialist");
-    selectedSpecialistInput.value = "";
+        const selectedSpecialistInput = document.getElementById("selectedSpecialist");
+        selectedSpecialistInput.value = "";
 
-    conditions.slice(0, 3).forEach((cond, index) => {
-        const card = document.createElement("div");
-        card.className = "col-md-4";
+        conditions.slice(0, 3).forEach((cond, index) => {
+            const card = document.createElement("div");
+            card.className = "col-md-4";
 
-        card.innerHTML = `
-            <div class="card border-primary shadow-sm h-100 specialist-card" data-specialist="${cond.specialist}">
-                <div class="card-body">
-                    <h5 class="card-title"><strong>Suggested Specialist:</strong> ${cond.specialist}</h5>
-                    <p class="card-text"><strong>Condition:</strong> ${cond.condition_name}</p>
-                    <p class="card-text"><strong>Probability:</strong> ${cond.probability}</p>
-                    <p class="card-text"><strong>Explanation:</strong> ${cond.explanation}</p>
+            card.innerHTML = `
+                <div class="card border-primary shadow-sm h-100 specialist-card" data-specialist="${cond.specialist}">
+                    <div class="card-body">
+                        <h5 class="card-title"><strong>Suggested Specialist:</strong> ${cond.specialist}</h5>
+                        <p class="card-text"><strong>Condition:</strong> ${cond.condition_name}</p>
+                        <p class="card-text"><strong>Probability:</strong> ${cond.probability}</p>
+                        <p class="card-text"><strong>Explanation:</strong> ${cond.explanation}</p>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
 
-        card.querySelector('.specialist-card').addEventListener('click', function () {
-            document.querySelectorAll('.specialist-card').forEach(el => {
-                el.classList.remove('border-success');
+            card.querySelector('.specialist-card').addEventListener('click', function () {
+                document.querySelectorAll('.specialist-card').forEach(el => {
+                    el.classList.remove('border-success');
+                });
+                this.classList.add('border-success');
+                selectedSpecialistInput.value = this.dataset.specialist;
             });
-            this.classList.add('border-success');
-            selectedSpecialistInput.value = this.dataset.specialist;
-        });
 
-        cardsContainer.appendChild(card);
+            cardsContainer.appendChild(card);
     });
 
     const modal = new bootstrap.Modal(document.getElementById("diagnosisModal"));

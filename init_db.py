@@ -1,4 +1,3 @@
-import os
 from _datetime import datetime
 from dateutil.relativedelta import relativedelta, MO
 from app import app, db
