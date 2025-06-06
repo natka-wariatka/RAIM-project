@@ -52,21 +52,25 @@
 
           <div class="row g-3 mb-3">
             <div class="col-md-6">
-              <input name="first_name" class="form-control" placeholder="First Name" required>
+              <input name="first_name" class="form-control" placeholder="First Name" required
+                     value="{% if form_data %}{{ form_data.get('first_name', '') }}{% endif %}">
             </div>
             <div class="col-md-6">
-              <input name="last_name" class="form-control" placeholder="Last Name" required>
+              <input name="last_name" class="form-control" placeholder="Last Name" required
+                     value="{% if form_data %}{{ form_data.get('last_name', '') }}{% endif %}">
             </div>
           </div>
 
           <div class="row g-3 mb-3">
             <div class="mb-3">
                 <label for="date_of_birth" class="form-label">Date of Birth</label>
-                <input type="text" name="date_of_birth" id="date_of_birth" class="form-control" placeholder="DD.MM.YYYY" required>
+                <input type="text" name="date_of_birth" id="date_of_birth" class="form-control" placeholder="DD.MM.YYYY" required
+                     value="{% if form_data %}{{ form_data.get('date_of_birth', '') }}{% endif %}">
                 <div class="form-text">Format: DD.MM.YYYY</div>
             </div>
             <div class="col-md-6">
-              <input type="email" name="email" class="form-control" placeholder="Email" required>
+              <input type="email" name="email" class="form-control" placeholder="Email" required
+                     value="{% if form_data %}{{ form_data.get('email', '') }}{% endif %}">
             </div>
           </div>
 

@@ -77,6 +77,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // E-mail validation
+    const email = $('#email').val();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email || !emailRegex.test(email)) {
+        isValid = false;
+        $('#email').addClass('is-invalid');
+
+
+        $('html, body').animate({
+            scrollTop: $('#email').offset().top - 20
+        }, 500);
+
+        return false;
+    }
+
     // Blood test numerical values validation
     document.addEventListener('input', function(e) {
         if (e.target.classList.contains('test-result') ||

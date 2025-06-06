@@ -74,6 +74,20 @@
                                 <div class="form-text">Format: DD.MM.YYYY</div>
                             </div>
                         </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else "")) }}
+                            {% if form.email.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.email.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Enter a valid email address</div>
+                        </div>
+                    </div>
                     </div>
                 </div>
             </div>

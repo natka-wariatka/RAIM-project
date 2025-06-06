@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const socket = io(); // Connect to the server
+    socket.emit("chatbot");
     const textarea = document.getElementById("userInput");
     const sendBtn = document.getElementById("sendBtn");
     const diagnoseBtn = document.getElementById("diagnoseBtn");
@@ -44,15 +45,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     socket.on("bot_response", function(data) {
-    if (data.type === 'text') {
-        addMessage("assistant", data.response);
-    };
-    if (data.type === 'not_diagnosis') {
-        addMessage("assistant", data.response);
-    } else if (data.type === 'diagnosis') {
-        addMessage("assistant", "Based on your answers, here are some possible conditions:");
-        displayDiagnosisPopup(data.conditions, data.raw_text);
-    }
+        if (data.type === 'text' || data.type === 'intro') {
+            addMessage("assistant", data.response);
+        }
+        if (data.type === 'not_diagnosis') {
+            addMessage("assistant", data.response);
+        }
+        if (data.type === 'diagnosis') {
+            addMessage("assistant", "Based on your answers, here are some possible conditions:");
+            displayDiagnosisPopup(data.conditions, data.raw_text);
+        }
     });
 
  function displayDiagnosisPopup(conditions, rawText) {

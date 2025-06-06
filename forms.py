@@ -1,8 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, DateField, FormField, FieldList, TextAreaField, SelectMultipleField, \
     FloatField
-from wtforms.validators import DataRequired, Regexp, ValidationError, Optional, NumberRange
-from wtforms.widgets import CheckboxInput
+from wtforms.validators import DataRequired, Regexp, ValidationError, Optional, Email
 from datetime import datetime
 
 
@@ -57,6 +56,7 @@ class MedicalDataForm(FlaskForm):
                                     DataRequired(message="Date of birth is required"),
                                     Regexp(r'^(\d{2})\.(\d{2})\.(\d{4})$', message="Please use DD.MM.YYYY format")
                                 ])
+    email = StringField('Email Address', validators = [DataRequired(), Email()])
 
     # Blood Test Results
     blood_tests = FieldList(FormField(BloodTestForm), min_entries=0) # mogą zostać puste

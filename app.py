@@ -69,7 +69,7 @@ specialists_list = [
 def init_openai():
     try:
         model = ChatOpenAI(
-            model="gpt-4",  # lub "gpt-3.5-turbo"
+            model="gpt-4",  # or "gpt-3.5-turbo"
             temperature=0.7,
             api_key=os.environ.get("OPENAI_API_KEY")
         )
@@ -84,7 +84,7 @@ chatbot_pipeline = init_openai()
 @app.route('/', methods=['GET', 'POST'])
 def index():
     print("render")
-    predefined_blood_tests = [  # Tabela referencyjna
+    predefined_blood_tests = [  # Reference table
         {"name": "RBC Erythrocytes", "unit": "million/\u00b5L", "ref_min": 4.2, "ref_max": 5.8},
         {"name": "HGB Hemoglobin", "unit": "g/dL", "ref_min": 12.0, "ref_max": 15.5},
         {"name": "HCT Hematocrit", "unit": "%", "ref_min": 36, "ref_max": 46},
@@ -112,13 +112,14 @@ def index():
                     flash(f"Error in {field}: {error}", "danger")
             return render_template('form.html', form=form)
 
-        try:
+        try: # Storing data in session
             session['form_data'] = {
                 'personal_info': {
                     'first_name': form.first_name.data,
                     'last_name': form.last_name.data,
                     'gender': form.gender.data,
-                    'date_of_birth': form.date_of_birth.data
+                    'date_of_birth': form.date_of_birth.data,
+                    'email': form.email.data
                 },
                 'blood_tests': [
                     {
@@ -143,17 +144,9 @@ def index():
             logging.error(f"Error processing form: {str(e)}")
             flash(f"An error occurred: {str(e)}", "danger")
 
-        if form.validate_on_submit():
-            # Zapisz dane do sesji
-            session['first_name'] = form.first_name.data
-            session['last_name'] = form.last_name.data
-            session['date_of_birth'] = form.date_of_birth.data
-
-            # przekieruj do drugiego formularza
-            return redirect(url_for('show_appointments'))
-
     return render_template('form.html', form=form)
 
+# Results page
 @app.route('/results')
 def results():
     form_data = session.get('form_data')
@@ -175,15 +168,28 @@ def export_json():
 
 @app.route('/chatbot')
 def chat_view():
+    session_data = session.get('form_data')
+    form_data = {}
+
+    if session_data and 'personal_info' in session_data:
+        form_data = session_data['personal_info']
+
+    return render_template('index_chatbot.html', form_data=form_data)
+
+@socketio.on('chatbot')
+def chat_intro():
     form_data = session.get('form_data')
     if not form_data:
-        return render_template('index_chatbot.html')
+        emit('bot_response', {'type': 'intro', 'response': "✨ Hello, is there anything you want to talk about? I am here to help you with your health ✨"})
+        return 
 
+    emit('bot_response', {'type': 'intro', 'response': "✨ Processing provided form... ✨"})
     intro_text = f"The following medical data has been provided:\n{json.dumps(form_data, indent=2)}"
     add_to_history('user', intro_text)
-    add_to_history('assistant', chatbot_pipeline.invoke(prompt.medical_interview_response(intro_text, session['history'])))
+    first_response = chatbot_pipeline.invoke(prompt.medical_interview_response(intro_text, session['history']))
+    add_to_history('assistant', first_response)
+    emit('bot_response', {'type': 'text', 'response': first_response})
 
-    return render_template('index_chatbot.html')
 
 def add_to_history(role, content):
     if 'history' not in session:
@@ -249,30 +255,28 @@ def handle_diagnose():
 
 @app.route('/bookings')
 def bookings_view():
-    # Get all specialties for the dropdown
+    session_data = session.get('form_data')
+    form_data = {}
+
+    if session_data and 'personal_info' in session_data:
+        form_data = session_data['personal_info']
+
     specialties = db.session.query(Doctor.specialty).distinct().all()
     specialties = [s[0] for s in specialties]
-    return render_template('index.html', specialties=specialties)
+
+    return render_template('index.html', specialties=specialties, form_data=form_data)
 
 
 @app.route('/appointments', methods=['POST'])
 def show_appointments():
-    patient_data = session.get('patient_data', {
-        'first_name': '',
-        'last_name': '',
-        'date_of_birth': '',
-        'email': ''
-    })
-    return render_template('appointments.html', patient_data=patient_data)
-
-    # POST
+    # Get form data
     first_name = request.form.get('first_name')
     last_name = request.form.get('last_name')
     date_of_birth = request.form.get('date_of_birth')
     email = request.form.get('email')
     specialty = request.form.get('specialty')
 
-    # Walidacja
+    # Validate form data
     if not all([first_name, last_name, date_of_birth, email, specialty]):
         flash('All fields are required', 'danger')
         return redirect(url_for('index'))
@@ -328,6 +332,7 @@ def show_appointments():
         sorted_dates=sorted_dates,
         doctors={doctor.id: doctor for doctor in doctors}
     )
+
 
 
 @app.route('/book_appointment', methods=['POST'])
@@ -417,7 +422,7 @@ def admin_login_page():
 @app.route('/admin/login', methods=['POST'])
 def admin_login():
     password = request.form.get('password')
-    admin_password = 'aleklops!'  # Hardcoded password as requested
+    admin_password = 'aleklops!'
 
     if password == admin_password:
         session['admin_authenticated'] = True

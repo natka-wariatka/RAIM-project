@@ -19,23 +19,27 @@
                 <form action="{{ url_for('show_appointments') }}" method="post" id="patient-form">
                     <div class="mb-3">
                         <label for="first_name" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="first_name" name="first_name" required>
+                        <input type="text" class="form-control" id="first_name" name="first_name" required
+                        value="{% if form_data %}{{ form_data.get('first_name', '') }}{% endif %}">
                     </div>
                     
                     <div class="mb-3">
                         <label for="last_name" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="last_name" name="last_name" required>
+                        <input type="text" class="form-control" id="last_name" name="last_name" required
+                               value="{% if form_data %}{{ form_data.get('last_name', '') }}{% endif %}">
                     </div>
                     
                     <div class="mb-3">
                         <label for="date_of_birth" class="form-label">Date of Birth</label>
-                        <input type="text" name="date_of_birth" id="date_of_birth" class="form-control" placeholder="DD.MM.YYYY" required>
+                        <input type="text" name="date_of_birth" id="date_of_birth" class="form-control" placeholder="DD.MM.YYYY" required
+                        value="{% if form_data %}{{ form_data.get('date_of_birth', '') }}{% endif %}">
                         <div class="form-text">Format: DD.MM.YYYY</div>
                     </div>
                     
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
+                        <input type="email" class="form-control" id="email" name="email" required
+                        value="{% if form_data %}{{ form_data.get('email', '') }}{% endif %}">
                     </div>
                     
                     <div class="mb-4">
